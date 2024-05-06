@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export function Compras() {
   return (
     <View style={styles.container}>
-      <Text>Compras!</Text>
+      <Text>Compras!Giovanna</Text>
       <StatusBar style="auto" />
     </View>
   );

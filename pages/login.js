@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export function Login() {
   return (
     <View style={styles.container}>
-      <Text>Login!</Text>
+      <Text>Login!Giovanna</Text>
       <StatusBar style="auto" />
     </View>
   );

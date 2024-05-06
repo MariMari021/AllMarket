@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export function Cadastro() {
   return (
     <View style={styles.container}>
-      <Text>Cadastro!</Text>
+      <Text>Cadastro!Giovanna</Text>
       <StatusBar style="auto" />
     </View>
   );
