@@ -1,65 +1,256 @@
+<View style={styles.cardAdicionado}>
+                            <Image
+                                style={styles.imgCardAdicionado}
+                                source={require('../assets/fotoAdicionado.png')}
+                            />
+                            <Text style={styles.tituloAdicionar}>
+                                Alimento
+                            </Text>
+                            <View style={styles.valores}>
+                                <TouchableOpacity style={styles.botaoMaisProduto}>
+                                    <Image style={styles.botaoMaisProduto}
+                                        source={require('../assets/botaoMais.png')}
+                                    />
+                                </TouchableOpacity>
+                                <Text style={styles.quantidade}>0</Text>
+                                <TouchableOpacity style={styles.botaoMenosProduto}>
+                                    <Image style={styles.botaoMenosProduto}
+                                        source={require('../assets/botaoMenos.png')}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.valorProduto}>R$ 15,00</Text>
+                            <TouchableOpacity style={styles.botaoMais} onPress={() => navigation.navigate('Produtos')}>
+                                <Image
+                                    style={styles.maisProduto}
+                                    source={require('../assets/editar.png')}
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+
+
+
+
+
+                        Produtos ORIGINAL
+
+
+                        import { StyleSheet, Text, View, ImageBackground, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { useFonts } from 'expo-font';
+import { useCallback } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import React from 'react';
+
+
+export function Produtos({ navigation }) {
+    const [nomeProduto, setNomeProduto] = useState('');
+    const [quantidade, setQuantidade] = useState('');
+    const [precoUnitario, setPrecoUnitario] = useState('');
+
+    const adicionarProduto = () => {
+        const produto = {
+            nome: nomeProduto,
+            quantidade: parseInt(quantidade),
+            precoUnitario: parseFloat(precoUnitario),
+        };
+        navigation.navigate('Home', { produto: produto });
+    };
+
+
+    const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
+
+    const onLayoutRootView = useCallback(async () => {
+        if (fontsLoaded || fontError) {
+            await SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded, fontError]);
+
+    if (!fontsLoaded && !fontError) {
+        return null;
+    }
+    return (
+        <View style={styles.container} onLayout={onLayoutRootView}>
+            <ImageBackground
+                source={require('../assets/backgroundProdutos.png')}
+                style={styles.background}
+            >
+            </ImageBackground>
+            <View style={styles.containerForm}>
+
+                <View style={styles.voltar}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                        <Image
+                            style={styles.setaEsquerda}
+                            source={require('../assets/seta_esquerda.png')}
+                        />
+                    </TouchableOpacity>
+                    <View style={styles.inputContainer}>
+                        <Image
+                            style={styles.sacolaBranca}
+                            source={require('../assets/sacolaBranca.png')}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Insira o nome do produto"
+                            placeholderTextColor="#fff"
+                        />
+
+                    </View>
+                </View>
+                <View style={styles.inputDois}>
+                    <Image
+                        style={styles.adicionar}
+                        source={require('../assets/adicionar.png')}
+                    />
+                    <TextInput
+                        style={styles.inputLinha}
+                        placeholder="Insira quantas unidades"
+                        placeholderTextColor="rgba(00, 00, 00, 0.74)"
+                    />
+                </View>
+                <View style={styles.inputTres}>
+                    <Image
+                        style={styles.adicionar}
+                        source={require('../assets/adicionar.png')}
+                    />
+                    <TextInput
+                        style={styles.inputLinha}
+                        placeholder="Insira o preço unitário"
+                        placeholderTextColor='rgba(00, 00, 00, 0.74)'
+                    />
+                </View>
+                <TouchableOpacity style={styles.botao} onPress={adicionarProduto}>
+                    <Image
+                        style={styles.verificado}
+                        source={require('../assets/verificado.png')}
+                    />
+                    <Text style={styles.botaoText}>
+                        Adicionar Produto
+                    </Text>
+
+                </TouchableOpacity>
+            </View>
+
+        </View>
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#0B8C38',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    background: {
+
+        width: "100%",
+        height: '190%',
+        flex: 1,
+        resizeMode: 'cover', // 'cover' para cobrir todo o contêiner
+        // Ajuste o conteúdo verticalmente no centro
+    },
+    voltar: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+
+    },
+    setaEsquerda: {
+        width: 35,
+        height: 35,
+
+    },
+    containerForm: {
+        padding: 40,
+        width: "100%",
+        backgroundColor: "#fff",
+        borderTopEndRadius: 30,
+        borderTopStartRadius: 30,
+        height: "60%",
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: 'center',
+        backgroundColor: 'rgba(11, 140, 56, 0.8)',
+        borderRadius: 17,
+        paddingHorizontal: 35,
+
+    },
+    input: {
+        width: 192,
+        height: 45,
+        fontSize: 16,
+        fontFamily: "Inter",
+        color: "white",
+        fontWeight: "600"
+    },
+    sacolaBranca: {
+        opacity: 1,
+        width: 24,
+        height: 24,
+        marginRight: 10,
+    },
+    inputDois: {
+        flexDirection: "row",
+        paddingTop: "13%"
+    },
+    inputTres: {
+        flexDirection: "row",
+        paddingTop: "11%"
+    },
+    adicionar: {
+        width: 34,
+        height: 34,
+        marginRight: '2%'
+    },
+    inputLinha: {
+        borderBottomColor: "#0B8C38",
+        borderBottomWidth: 1.8,
+        flex: 97 / 100,
+        fontFamily: "Inter",
+        fontWeight: "500",
+        paddingLeft: "2%"
+    },
+    verificado: {
+        width: 27,
+        height: 27
+    },
+    botao: {
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        backgroundColor: "#0B8C38",
+        height: 45,
+        paddingEnd: 50,
+        paddingStart: 50,
+        marginTop: 42,
+        borderRadius: 17,
+        alignItems: "center",
+        marginBottom: 15
+    },
+    botaoText: {
+        fontFamily: "Inter",
+        fontSize: 17,
+        fontWeight: "700",
+        color: "#fff"
+    }
+
+});
+
+
+
+index.js:
+
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import { CardAdicionado } from './cardAdicionado';
 
 
 export function Home({ navigation, route }) {
-    const [produtosAdicionados, setProdutosAdicionados] = useState([]);
-    const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
-    const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
-    const [valorLimite, setValorLimite] = useState(0); // Estado para armazenar o valor limite digitado
-    const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
-
-    const adicionarProduto = (produto) => {
-        const novoProduto = { id: nextId, ...produto };
-        setProdutosAdicionados([...produtosAdicionados, novoProduto]);
-        setNextId(nextId + 1);
-    };
-
-    const removerProduto = (idParaRemover) => {
-        // Encontra o índice do produto a ser removido
-        const indexToRemove = produtosAdicionados.findIndex(produto => produto.id === idParaRemover);
-
-        // Se o índice for encontrado, remove o produto da lista utilizando splice
-        if (indexToRemove !== -1) {
-            const newProdutosAdicionados = [...produtosAdicionados];
-            newProdutosAdicionados.splice(indexToRemove, 1); // Remove 1 elemento a partir do índice indexToRemove
-            setProdutosAdicionados(newProdutosAdicionados);
-        }
-    };
-
-    const editarProduto = (id, novaQuantidade) => {
-        setProdutosAdicionados(produtosAdicionados.map(produto => {
-            if (produto.id === id) {
-                return { ...produto, quantidade: novaQuantidade };
-            }
-            return produto;
-        }));
-    };
-
-    useEffect(() => {
-        if (route.params && route.params.novoProduto) {
-            const novoProduto = route.params.novoProduto;
-            adicionarProduto(novoProduto);
-        }
-    }, [route.params]);
-
-    useEffect(() => {
-        let total = 0;
-        produtosAdicionados.forEach(produto => {
-            total += produto.preco * produto.quantidade;
-        });
-        setTotalPreco(total);
-    }, [produtosAdicionados]);
-
-    useEffect(() => {
-        const limite = parseFloat(valorLimite);
-        setLimiteUltrapassado(totalPreco > limite);
-    }, [totalPreco, valorLimite]);
-
-
+    const [text, setText] = useState('');
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
 
     useEffect(() => {
@@ -122,18 +313,8 @@ export function Home({ navigation, route }) {
                         style={styles.input}
                         placeholder="Digite o valor máx. da compra."
                         placeholderTextColor="#000"
-                        keyboardType="numeric"
-                        onChangeText={setValorLimite}
-                        onBlur={() => {
-                            const limite = parseFloat(valorLimite);
-                            if (totalPreco > limite) {
-                                setLimiteUltrapassado(true);
-                                Alert.alert('Limite Ultrassado', 'O valor total dos produtos excede o limite especificado.');
-                            } else {
-                                setLimiteUltrapassado(false);
-                            }
-                        }}
-                        value={valorLimite.toString()}
+                        onChangeText={setText}
+                        value={text}
                     />
                 </View>
                 <View style={styles.mercados}>
@@ -182,15 +363,13 @@ export function Home({ navigation, route }) {
                                     Outros
                                 </Text>
                             </TouchableOpacity>
-
+                            
 
                         </ScrollView>
                     </View>
 
                 </View>
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}
-
-                >
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                     <View style={styles.cardContainer}>
                         <View style={styles.card}>
                             <Image
@@ -208,20 +387,10 @@ export function Home({ navigation, route }) {
                                 />
                             </TouchableOpacity>
                         </View>
-                        {produtosAdicionados.map((produto) => (
-                            <CardAdicionado
-                                key={produto.id}
-                                id={produto.id} // Passa o ID do produto
-                                nome={produto.nome}
-                                quantidade={produto.quantidade}
-                                preco={produto.preco}
-                                onPressRemover={removerProduto} // Passa a função removerProduto
-                                onPressEditar={editarProduto} />
-                        ))}
                     </View>
                 </ScrollView>
                 <View style={styles.limparContainer}>
-                    <TouchableOpacity style={styles.apagarTudo} >
+                    <TouchableOpacity style={styles.apagarTudo}>
                         <Image
                             style={styles.lixo}
                             source={require('../assets/lixo.png')}
@@ -241,17 +410,11 @@ export function Home({ navigation, route }) {
                             />
                             <Text style={styles.valorTotalTexto}>R$</Text>
                         </View>
-                        <Text style={[styles.valorTotalPreco, { color: limiteUltrapassado ? 'orange' : 'white' }]}>
-                            {totalPreco.toFixed(2)}
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.mensagemFinal}>
-                    {limiteUltrapassado && (
-                        <Text style={styles.avisoLimite}>O valor total dos produtos excede o limite especificado.</Text>
-                    )}
-                </View>
+                        <Text style={styles.valorTotalPreco}>0</Text>
 
+                    </View>
+
+                </View>
 
             </View>
         </ScrollView>
@@ -478,7 +641,7 @@ const styles = StyleSheet.create({
     },
     cardContainer: {
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-between",
         padding: 40,
         alignItems: "center"
     },

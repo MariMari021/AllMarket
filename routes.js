@@ -1,5 +1,4 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Home } from './pages/index';
 import { Login } from './pages/login';
@@ -7,6 +6,7 @@ import { Cadastro } from './pages/cadastro';
 import { Compras } from './pages/compras';
 import { Perfil } from './pages/perfil';
 import { Produtos } from './pages/produtos';
+import { CardAdicionado } from './pages/cardAdicionado';
 
 
 const Stack = createStackNavigator();
@@ -21,6 +21,7 @@ const Navigation = () => {
             <Stack.Screen name="Compras" component={Compras} options={{ headerShown: false }} />
             <Stack.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
             <Stack.Screen name="Produtos" component={Produtos} options={{ headerShown: false }} />
+            <Stack.Screen name="CardAdicionado" component={CardAdicionado} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 };
