@@ -9,7 +9,8 @@ export function Home({ navigation, route }) {
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
     const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
     const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
-    const [valorLimite, setValorLimite] = useState(0); // Estado para armazenar o valor limite digitado
+    const [valorLimite, setValorLimite] = useState(''); // Inicializa sem nenhum valor
+    // Estado para armazenar o valor limite digitado
     const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
 
     const adicionarProduto = (produto) => {
@@ -58,6 +59,8 @@ export function Home({ navigation, route }) {
         const limite = parseFloat(valorLimite);
         setLimiteUltrapassado(totalPreco > limite);
     }, [totalPreco, valorLimite]);
+
+
 
 
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
@@ -250,6 +253,13 @@ export function Home({ navigation, route }) {
                     {limiteUltrapassado && (
                         <Text style={styles.avisoLimite}>O valor total dos produtos excede o limite especificado.</Text>
                     )}
+
+                    {totalPreco > valorLimite && (
+                        <Text style={styles.diferençaTotal}>
+                            Diferença: R${' '}
+                            {limiteUltrapassado ? (totalPreco - valorLimite).toFixed(2) : (valorLimite - totalPreco).toFixed(2)}
+                        </Text>
+                    )}
                 </View>
 
 
@@ -293,7 +303,7 @@ const styles = StyleSheet.create({
         fontSize: 26
     },
     logo: {
-        width: 150,
+        width: 155,
         height: 35
     },
     dinheiro: {

@@ -63,28 +63,21 @@ export function Produtos({ navigation }) {
             </ImageBackground>
             <View style={styles.containerForm}>
 
-                <View style={styles.voltar}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                        <Image
-                            style={styles.setaEsquerda}
-                            source={require('../assets/seta_esquerda.png')}
-                        />
-                    </TouchableOpacity>
-                    <View style={styles.inputContainer}>
-                        <Image
-                            style={styles.sacolaBranca}
-                            source={require('../assets/sacolaBranca.png')}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Insira o nome do produto"
-                            placeholderTextColor="#fff"
-                            value={nomeProduto}
-                            onChangeText={setNomeProduto}
-                        />
+                <View style={styles.inputContainer}>
+                    <Image
+                        style={styles.sacolaBranca}
+                        source={require('../assets/sacolaBranca.png')}
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Insira o nome do produto"
+                        placeholderTextColor="#fff"
+                        value={nomeProduto}
+                        onChangeText={setNomeProduto}
+                    />
 
-                    </View>
                 </View>
+
                 <View style={styles.inputDois}>
                     <Image
                         style={styles.adicionar}
@@ -119,9 +112,15 @@ export function Produtos({ navigation }) {
                         source={require('../assets/verificado.png')}
                     />
                     <Text style={styles.botaoText}>
-                        Adicionar Produto
+                        Aplicar Dados
                     </Text>
 
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                    <Image
+                        style={styles.setaEsquerda}
+                        source={require('../assets/seta_esquerda.png')}
+                    />
                 </TouchableOpacity>
             </View>
 
@@ -139,20 +138,15 @@ const styles = StyleSheet.create({
     background: {
 
         width: "100%",
-        height: '190%',
+        height: '150%',
         flex: 1,
-        resizeMode: 'cover', // 'cover' para cobrir todo o contêiner
+        // resizeMode: 'contain', // 'cover' para cobrir todo o contêiner
         // Ajuste o conteúdo verticalmente no centro
-    },
-    voltar: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between"
-
     },
     setaEsquerda: {
         width: 35,
         height: 35,
+        marginBottom:25
 
     },
     containerForm: {
@@ -161,7 +155,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         borderTopEndRadius: 30,
         borderTopStartRadius: 30,
-        height: "60%",
+        height: "55%",
     },
     inputContainer: {
         flexDirection: 'row',

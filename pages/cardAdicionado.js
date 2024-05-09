@@ -19,10 +19,10 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
     };
 
 
-    
-    
+
+
     const nomeFormatado = nome.charAt(0).toUpperCase() + nome.slice(1);
-    
+
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
 
     const onLayoutRootView = useCallback(async () => {
@@ -56,12 +56,20 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
                 </TouchableOpacity>
             </View>
             <Text style={styles.valorProduto}>R$ {valorTotal.toFixed(2)}</Text>
-            <TouchableOpacity style={styles.botaoMais} onPress={() => onPressRemover(id)}>
-                <Image
-                    style={styles.maisProduto}
-                    source={require('../assets/editar.png')}
-                />
-            </TouchableOpacity>
+            <View style={styles.apagarEditar}>
+                <TouchableOpacity style={styles.botaoEditar} onPress={() => onPressRemover(id)}>
+                    <Image
+                        style={styles.remover}
+                        source={require('../assets/editar.png')}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.botaoMais} >
+                    <Image
+                        style={styles.maisProduto}
+                        source={require('../assets/editar.png')}
+                    />
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -71,7 +79,7 @@ const styles = StyleSheet.create({
         marginRight: 53,
         paddingTop: 10,
         backgroundColor: "#0B8C38",
-        height: 325,
+        minHeight: 325,
         width: 230,
         borderRadius: 22,
         shadowColor: '#000', // Cor da sombra
@@ -118,16 +126,19 @@ const styles = StyleSheet.create({
         fontWeight: "800",
         fontSize: 27,
         color: "#F7AB38",
-        width: 129.8,
+        marginEnd:"12%",
         marginStart: "12%"
     },
     imgCardAdicionado: {
         width: 115,
         height: 115,
         alignSelf: "flex-end",
-        marginTop: 15
+        marginTop: 10
     },
     botaoMais: {
+        marginEnd: '8%'
+    },
+    botaoEditar: {
         marginEnd: '8%'
     },
     maisProduto: {
@@ -136,6 +147,17 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
 
     },
+    remover: {
+        width: 43,
+        height: 43,
+        marginTop:10
+
+    },
+    apagarEditar: {
+        flexDirection: "row",
+        alignSelf: "flex-end",
+        paddingBottom:15
+    }
 
 
 })
