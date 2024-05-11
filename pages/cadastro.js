@@ -1,9 +1,64 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export function Cadastro() {
+  const [username, setUsername] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigation = useNavigation();
 
- 
+  const handleUsernameChange = (text) => {
+    setUsername(text);
+  };
+
+  const handleBirthdayChange = (text) => {
+    text = text.replace(/[^\d/]/g, '');
+    setBirthday(text);
+  };
+
+  const handlePhoneChange = (text) => {
+    text = text.replace(/[^\d]/g, '');
+    setPhone(text);
+  };
+
+  const handleEmailChange = (text) => {
+    setEmail(text);
+  
+    if (!text.includes('@')) {
+      setErrorMessage('Por favor, insira um email válido.');
+    } else {
+      setErrorMessage('');
+    }
+  };
+  
+  
+  
+  
+
+  const handlePasswordChange = (text) => {
+    setPassword(text);
+
+    if (text.length !== 8 || !/[!@#$%]/.test(text)) {
+      setErrorMessage('A senha deve ter 8 caracteres e conter pelo menos um símbolo (!@#$%).');
+    } else {
+      setErrorMessage('');
+    }
+  };
+
+  const handleCadastro = () => {
+    if (!username || !birthday || !phone || !email || !password || errorMessage) {
+      setErrorMessage('Por favor, preencha todos os campos corretamente.');
+      return;
+    }
+
+    navigation.navigate('Sucesso');
+    setErrorMessage('');
+  };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -11,44 +66,55 @@ export function Cadastro() {
         style={styles.backgroundImage}
       >
         <View style={styles.containerForm}>
-          <Text style={styles.welcomeText}>Cadastre-se</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome de Usuário"
-            // Aqui você pode adicionar mais propriedades conforme necessário
-          />
-          <View style={styles.inlineInputs}>
+            <Text style={styles.welcomeText}>Cadastre-se em nosso App!</Text>
             <TextInput
-              style={[styles.input, styles.inlineInput]}
-              placeholder="Data de Aniversário"
-              // Aqui você pode adicionar mais propriedades conforme necessário
+              style={styles.input}
+              placeholder="Nome de Usuário"
+              value={username}
+              onChangeText={handleUsernameChange}
             />
+            <View style={styles.inlineInputs}>
+              <TextInput
+                style={[styles.input, styles.inlineInput]}
+                placeholder="Data de Aniversário (dd/mm/aaaa)"
+                value={birthday}
+                onChangeText={handleBirthdayChange}
+              />
+              <TextInput
+                style={[styles.input, styles.inlineInput, styles.phone]}
+                placeholder="Telefone"
+                value={phone}
+                onChangeText={handlePhoneChange}
+                keyboardType="numeric"
+              />
+            </View>
+
             <TextInput
-              style={[styles.input, styles.inlineInput, styles.phone]}
-              placeholder="Telefone"
-              // Aqui você pode adicionar mais propriedades conforme necessário
+              style={[styles.input, styles.bottomInput]}
+              placeholder="Email"
+              value={email}
+              onChangeText={handleEmailChange}
             />
-          </View>
-          <TextInput
-            style={[styles.input, styles.bottomInput]}
-            placeholder="Email"
-            // Aqui você pode adicionar mais propriedades conforme necessário
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            secureTextEntry={true}
-            // Aqui você pode adicionar mais propriedades conforme necessário
-          />
-          <TouchableOpacity
-            style={styles.loginButton} // Aplicando o estilo do botão de login
-            onPress={() => {
-              // Adicione sua lógica de autenticação aqui
-            }}
-          >
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-         
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                secureTextEntry={true}
+                value={password}
+                onChangeText={handlePasswordChange}
+              />
+              {errorMessage ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorMessage}>{errorMessage}</Text>
+                </View>
+              ) : null}
+            </View>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={handleCadastro}
+            >
+              <Text style={styles.buttonText}>Cadastrar</Text>
+            </TouchableOpacity>
         </View>
       </ImageBackground>
     </View>
@@ -70,13 +136,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     paddingStart: '5%',
     paddingEnd: '5%',
-    paddingTop: '20%',
+    paddingTop: '10%',
     paddingBottom: '5%',
     width: '100%',
     position: 'absolute',
-    bottom: -250, // Movendo o container para baixo
+    bottom: -250,
     alignItems: 'center',
-
   },
   welcomeText: {
     fontSize: 20,
@@ -97,13 +162,12 @@ const styles = StyleSheet.create({
   inlineInputs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
     width: '90%',
   },
   inlineInput: {
-    width: '48%', // Cada input ocupa 48% da largura
+    width: '48%',
   },
-  phone:{
+  phone: {
     marginLeft: 10
   },
   loginButton: {
@@ -119,7 +183,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   bottomInput: {
-    marginBottom: 20, // Ajustando o espaçamento para que seja igual aos outros inputs
+    marginBottom: 20,
+  },
+  inputContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  errorContainer: {
+    width: 300,
+    alignItems: 'center', // Centralizando horizontalmente
+  },
+  errorMessage: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center', // Centralizando horizontalmente
   },
 });
 
