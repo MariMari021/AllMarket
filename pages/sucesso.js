@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image, ImageBackground, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { FontAwesome5 } from '@expo/vector-icons'; // Importando o FontAwesome5
-import { ScrollView } from 'react-native-gesture-handler';
+import { LinearGradient } from "expo-linear-gradient";
 
 export function Sucesso({ navigation }) {
 
@@ -9,40 +9,51 @@ export function Sucesso({ navigation }) {
         navigation.navigate('Home'); // Navegar de volta para a página Index
     };
     return (
-        
-            <View style={styles.container}>
 
-                <ImageBackground
-                    source={require('../assets/fundoSucesso.png')} // Substitua 'background_image.jpg' pelo nome da sua imagem de fundo
-                    style={styles.backgroundImage}
-                >
+        <View style={styles.container}>
 
-                    <View style={styles.containerHeader}>
+            <ImageBackground
+                source={require('../assets/fundoSucesso.png')} // Substitua 'background_image.jpg' pelo nome da sua imagem de fundo
+                style={styles.backgroundImage}
+            >
 
+                <View style={styles.containerHeader}>
+
+                </View>
+              
+                <View style={styles.containerForm}>
+
+                    <View style={styles.mensagem}>
+                        <Image source={require('../assets/logo.png')}
+                            style={styles.logo}
+                        />
+                        <Image source={require('../assets/sucesso.gif')}
+                            style={styles.logo2}
+                        />
+                         <LinearGradient colors={["#F26E22", "#F9B690", "#FFFFFF"]} style={[StyleSheet.background, styles.teste]} >
+                                <View style={styles.avcTexto}>
+                                    <View style={styles.sol}>
+                                        <Text style={styles.titulo2}>
+                                            Seja bem vindo (a)
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.subtitulo}>
+                                    Seu cadastro foi concluído com sucesso.
+                                    </Text>
+                                </View>
+                                <Image source={require("../assets/concluido.png")} style={styles.avcImg} />
+                            </LinearGradient>
                     </View>
-
-                    <View style={styles.containerForm}>
-
-                        <View style={styles.mensagem}>
-                            <Image source={require('../assets/logo.png')}
-                                style={styles.logo}
-                            />
-                            <Image source={require('../assets/sucesso.gif')}
-                                style={styles.logo2}
-                            />
-                            <View style={styles.caixaTexto}>
-                                <Text style={styles.mensagemTexto}>
-                                    Seja bem-vindo(a)! Seu cadastro foi concluído com sucesso.
-                                </Text>
-                            </View>
-                        </View>
-                        <TouchableOpacity onPress={handleVoltar}> {/* Adicionando um TouchableOpacity para tornar o ícone clicável */}
+                    <TouchableOpacity onPress={handleVoltar}>
+                        <Text> {/* Envolver a string em um componente <Text> */}
                             <FontAwesome5 name="arrow-left" size={24} color="#0B8C38" /> {/* Ícone de voltar */}
-                        </TouchableOpacity>
-                    </View>
-                </ImageBackground>
-            </View>
-        
+                        </Text>
+                    </TouchableOpacity>
+
+                </View>
+            </ImageBackground>
+        </View>
+
     )
 }
 
@@ -110,9 +121,6 @@ const styles = StyleSheet.create({
     registerText: {
         color: '#a1a1a1'
     },
-    voltar: {
-        
-    },
     logo: {
         width: 155,
         height: 35,
@@ -153,5 +161,35 @@ const styles = StyleSheet.create({
     voltarTexto: {
         color: 'white',
         fontSize: 16
-    }
+    },
+    teste: {
+        width: 300,
+        height: 128,
+        borderRadius: 25,
+        backgroundColor: '#7485BF',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        padding: 15
+    },
+    avcTexto: {
+        paddingLeft: 7
+    },
+    titulo2: {
+        fontWeight: 'bold',
+        fontSize: 19.6,
+        color: 'white',
+        paddingRight: 60
+    },
+    subtitulo: {
+        fontSize: 14.7,
+        width: 170,
+        color: 'white',
+        fontWeight: '600'
+
+    },
+    avcImg: {
+        width: 95,
+        height: 85
+    },
 })

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+// import { ScrollView } from 'react-native-gesture-handler';
 
 export function Cadastro() {
   const [username, setUsername] = useState('');
@@ -34,10 +35,6 @@ export function Cadastro() {
       setErrorMessage('');
     }
   };
-  
-  
-  
-  
 
   const handlePasswordChange = (text) => {
     setPassword(text);
@@ -60,64 +57,61 @@ export function Cadastro() {
   };
 
   return (
+    // <ScrollView style={{ height: 50 }}>
     <View style={styles.container}>
       <ImageBackground
         source={require('../assets/cadastro.png')}
         style={styles.backgroundImage}
       >
         <View style={styles.containerForm}>
-            <Text style={styles.welcomeText}>Cadastre-se em nosso App!</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nome de Usuário"
-              value={username}
-              onChangeText={handleUsernameChange}
-            />
-            <View style={styles.inlineInputs}>
-              <TextInput
-                style={[styles.input, styles.inlineInput]}
-                placeholder="Data de Aniversário (dd/mm/aaaa)"
-                value={birthday}
-                onChangeText={handleBirthdayChange}
-              />
-              <TextInput
-                style={[styles.input, styles.inlineInput, styles.phone]}
-                placeholder="Telefone"
-                value={phone}
-                onChangeText={handlePhoneChange}
-                keyboardType="numeric"
-              />
+          <Text style={styles.welcomeText}>Cadastre-se em nosso App!</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome de Usuário"
+            value={username}
+            onChangeText={handleUsernameChange}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="(dd/mm/aaaa)"
+            value={birthday}
+            onChangeText={handleBirthdayChange}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Telefone"
+            value={phone}
+            onChangeText={handlePhoneChange}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={handleEmailChange}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            secureTextEntry={true}
+            value={password}
+            onChangeText={handlePasswordChange}
+          />
+          {errorMessage ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
             </View>
-
-            <TextInput
-              style={[styles.input, styles.bottomInput]}
-              placeholder="Email"
-              value={email}
-              onChangeText={handleEmailChange}
-            />
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                secureTextEntry={true}
-                value={password}
-                onChangeText={handlePasswordChange}
-              />
-              {errorMessage ? (
-                <View style={styles.errorContainer}>
-                  <Text style={styles.errorMessage}>{errorMessage}</Text>
-                </View>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={handleCadastro}
-            >
-              <Text style={styles.buttonText}>Cadastrar</Text>
-            </TouchableOpacity>
+          ) : null}
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={handleCadastro}
+          >
+            <Text style={styles.buttonText}>Cadastrar</Text>
+          </TouchableOpacity>
         </View>
       </ImageBackground>
     </View>
+    // </ScrollView>
   );
 };
 
@@ -140,8 +134,9 @@ const styles = StyleSheet.create({
     paddingBottom: '5%',
     width: '100%',
     position: 'absolute',
-    bottom: -250,
+    bottom: -300,
     alignItems: 'center',
+    height: '120%'
   },
   welcomeText: {
     fontSize: 20,
@@ -159,17 +154,6 @@ const styles = StyleSheet.create({
     width: 300,
     marginBottom: 20,
   },
-  inlineInputs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '90%',
-  },
-  inlineInput: {
-    width: '48%',
-  },
-  phone: {
-    marginLeft: 10
-  },
   loginButton: {
     backgroundColor: '#165515',
     alignItems: 'center',
@@ -182,13 +166,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold'
   },
-  bottomInput: {
-    marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 20,
-    alignItems: 'center',
-  },
   errorContainer: {
     width: 300,
     alignItems: 'center', // Centralizando horizontalmente
@@ -200,4 +177,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Cadastro;
+
