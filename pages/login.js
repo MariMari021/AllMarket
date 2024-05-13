@@ -69,8 +69,9 @@ const styles = StyleSheet.create({
     paddingBottom: '5%',
     width: '100%',
     position: 'absolute',
-    bottom: -250, // Movendo o container para baixo
+    bottom: -270, 
     alignItems: 'center',
+    height: '110%',
 
   },
   welcomeText: {
