@@ -819,3 +819,43 @@ const styles = StyleSheet.create({
 
 
 });
+
+
+
+
+CARDCONTAINER SALVAR
+
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}
+            >
+                <View style={styles.cardContainer}>
+                    <View style={styles.card}>
+                        <Image
+                            style={styles.imgCardAdicionar}
+                            source={require('../assets/imgCard1.png')}
+                        />
+                        <Text style={styles.tituloAdicionar}>
+                            Adicionar
+                        </Text>
+                        <Text style={styles.tituloAdicionarSpan}> o produto!</Text>
+                        <TouchableOpacity style={styles.botaoMais} onPress={() => navigation.navigate('Produtos')}>
+                            <Image
+                                style={styles.maisProduto}
+                                source={require('../assets/imgMaisProduto.png')}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    {produtosAdicionados.map((produto) => (
+                        <CardAdicionado
+                            key={produto.id} // Definir a chave como o ID do produto
+                            id={produto.id}
+                            nome={produto.nome}
+                            quantidade={produto.quantidade}
+                            preco={produto.preco}
+                            onPressRemover={removerProduto}
+                            onPressEditar={editarProduto}
+                            navigation={navigation}
+                        />
+                    ))}
+
+                </View>
+            </ScrollView>

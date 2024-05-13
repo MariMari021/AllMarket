@@ -1,16 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ImageBackground, Image, TextInput, TouchableOpacity, Text, Alert } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 
-export function Produtos({ navigation }) {
+export function Produtos({ navigation, route }) {
+    
+    const { produto } = route.params || {};
+    // Obtém o produto passado como parâmetro de navegação
+
     const [nomeProduto, setNomeProduto] = useState('');
     const [quantidade, setQuantidade] = useState('');
     const [preco, setPreco] = useState('');
 
+    useEffect(() => {
+        // Verifica se há um produto passado como parâmetro
+        if (produto) {
+            // Preenche os campos com as informações do produto
+            setNomeProduto(produto.nome);
+            setQuantidade(produto.quantidade.toString());
+            setPreco(produto.preco.toString());
+        }
+    }, [produto]); // Executa quando o produto muda
+
     const adicionarProduto = () => {
-        // Verificar se todos os campos estão preenchidos
+        // Verifica se todos os campos estão preenchidos
         if (nomeProduto.trim() === '' || quantidade.trim() === '' || preco.trim() === '') {
             Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
             return;
@@ -24,22 +38,16 @@ export function Produtos({ navigation }) {
             return;
         }
 
-        // Simular a adição do produto ao estado global ou local
-        const novoProduto = {
+        // Cria o objeto do novo produto com as informações atualizadas
+        const produtoAtualizado = {
+            id: produto ? produto.id : null, // Mantém o mesmo ID se estiver editando, caso contrário, é null (indicando um novo produto)
             nome: nomeProduto,
             quantidade: quant,
             preco: price,
         };
 
-        // Limpar os campos após adicionar o produto
-        setNomeProduto('');
-        setQuantidade('');
-        setPreco('');
-
-        // Informar ao usuário que o produto foi adicionado
-        Alert.alert('Sucesso', 'Produto adicionado com sucesso!', [
-            { text: 'OK', onPress: () => navigation.navigate('Home', { novoProduto }) }
-        ]);
+        // Navega de volta para a tela Home com o produto atualizado
+        navigation.navigate('Home', { produto: produtoAtualizado });
     };
 
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
@@ -146,7 +154,7 @@ const styles = StyleSheet.create({
     setaEsquerda: {
         width: 35,
         height: 35,
-        marginBottom:25
+        marginBottom: 25
 
     },
     containerForm: {

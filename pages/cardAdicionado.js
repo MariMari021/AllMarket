@@ -5,20 +5,26 @@ import { useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 
 
-export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, onPressEditar }) {
+export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, onPressAdicionar, navigation }) {
+
+
     const valorTotal = quantidade * preco;
 
+    // CardAdicionado.js
+
+    // CardAdicionado.js
+
     const adicionarUnidade = () => {
-        onPressEditar(id, quantidade + 1); // Chama a função onPressEditar do componente pai com o novo valor de quantidade
+        const novaQuantidade = quantidade + 1;
+        onPressAdicionar(id, novaQuantidade);
     };
 
     const removerUnidade = () => {
         if (quantidade > 1) {
-            onPressEditar(id, quantidade - 1); // Chama a função onPressEditar do componente pai com o novo valor de quantidade
+            const novaQuantidade = quantidade - 1;
+            onPressAdicionar(id, novaQuantidade);
         }
     };
-
-
 
 
     const nomeFormatado = nome.charAt(0).toUpperCase() + nome.slice(1);
@@ -60,15 +66,16 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
                 <TouchableOpacity style={styles.botaoEditar} onPress={() => onPressRemover(id)}>
                     <Image
                         style={styles.remover}
-                        source={require('../assets/editar.png')}
+                        source={require('../assets/apagarCard.png')}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.botaoMais} >
+                <TouchableOpacity style={styles.botaoMais} onPress={() => navigation.navigate('Produtos', { produto: { id, nome, quantidade, preco } })}>
                     <Image
                         style={styles.maisProduto}
                         source={require('../assets/editar.png')}
                     />
                 </TouchableOpacity>
+
             </View>
         </View>
     );
@@ -126,7 +133,7 @@ const styles = StyleSheet.create({
         fontWeight: "800",
         fontSize: 27,
         color: "#F7AB38",
-        marginEnd:"12%",
+        marginEnd: "12%",
         marginStart: "12%"
     },
     imgCardAdicionado: {
@@ -150,13 +157,13 @@ const styles = StyleSheet.create({
     remover: {
         width: 43,
         height: 43,
-        marginTop:10
+        marginTop: 10
 
     },
     apagarEditar: {
         flexDirection: "row",
         alignSelf: "flex-end",
-        paddingBottom:15
+        paddingBottom: 15
     }
 
 
