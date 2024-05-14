@@ -26,7 +26,7 @@ export function Produtos({ navigation, route }) {
     const adicionarProduto = () => {
         // Verifica se todos os campos estão preenchidos
         if (nomeProduto.trim() === '' || quantidade.trim() === '' || preco.trim() === '') {
-            Alert.alert('Atenção', 'Por favor, preencha todos os campos.');
+            alert('Por favor, preencha todos os campos.');
             return;
         }
 
@@ -34,7 +34,7 @@ export function Produtos({ navigation, route }) {
         const quant = parseInt(quantidade);
         const price = parseFloat(preco);
         if (isNaN(quant) || quant <= 0 || isNaN(price) || price <= 0) {
-            Alert.alert('Atenção', 'Por favor, insira uma quantidade e preço válidos.');
+            alert('Por favor, insira uma quantidade e preço válidos.');
             return;
         }
 
