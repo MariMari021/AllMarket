@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView, View, Text, Image, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, Image, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { CardAdicionado } from './cardAdicionado'; // Importe o componente CardAdicionado, se necessário
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -7,6 +7,9 @@ import * as SplashScreen from 'expo-splash-screen';
 
 export function Home({ navigation, route }) {
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
+    const [temCardAdicionado, setTemCardAdicionado] = useState(false);
+    const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
+    const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
     const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
     const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
     const [preco, setPreco] = useState('');
@@ -15,9 +18,22 @@ export function Home({ navigation, route }) {
     const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
     // Defina um estado para a quantidade do produto
     const [quantidade, setQuantidade] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState('Categoria1'); // Define "Categoria1" como categoria inicial selecionada
     const [scrollStates, setScrollStates] = useState({});
     const [nomeProduto, setNomeProduto] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+
+
+    useEffect(() => {
+        // Verificar se há algum card adicionado
+        if (produtosAdicionados.length > 0) {
+            setTemCardAdicionado(true);
+        } else {
+            setTemCardAdicionado(false);
+        }
+    }, [produtosAdicionados]);
+
+
 
     const handlePress = (option) => {
         setSelectedOption(option);
@@ -85,7 +101,7 @@ export function Home({ navigation, route }) {
             </ScrollView>
         );
     };
-    
+
     const getCategoryScrollView = (category) => {
         switch (category) {
             case 'Categoria1':
@@ -97,19 +113,58 @@ export function Home({ navigation, route }) {
             case 'Categoria4':
                 return renderCategoryScrollView(category, require('../assets/padaria.png'));
             case 'Categoria5':
-                return renderCategoryScrollView(category, require('../assets/imgCard5.png'));
+                return renderCategoryScrollView(category, require('../assets/acougue.png'));
             case 'Categoria6':
-                return renderCategoryScrollView(category, require('../assets/imgCard6.png'));
+                return renderCategoryScrollView(category, require('../assets/mercearia.png'));
             case 'Categoria7':
-                return renderCategoryScrollView(category, require('../assets/imgCard7.png'));
+                return renderCategoryScrollView(category, require('../assets/frios.png'));
             case 'Categoria8':
-                return renderCategoryScrollView(category, require('../assets/imgCard8.png'));
+                return renderCategoryScrollView(category, require('../assets/outros.png'));
             // Adicione mais casos conforme necessário para outras categorias
             default:
                 return null;
         }
     };
-    
+
+
+    const toggleCategoriaSelecionada = (categoria) => {
+        setCategoriasSelecionadas(prevState =>
+            prevState.includes(categoria)
+                ? prevState.filter(item => item !== categoria)
+                : [...prevState, categoria]
+        );
+    };
+
+    const limparCategoriasSelecionadas = () => {
+        if (produtosAdicionados.length > 0) {
+            const novosProdutos = produtosAdicionados.filter(produto => !categoriasSelecionadas.includes(produto.categoria));
+
+            let total = 0;
+            novosProdutos.forEach(produto => {
+                total += produto.preco * produto.quantidade;
+            });
+
+            setProdutosAdicionados(novosProdutos);
+            setTotalPreco(total);
+            setCategoriasSelecionadas([]);
+            if (total > 0) {
+                setModalVisible(true);
+            }
+        } else {
+            if (totalPreco === 0) {
+                setModalAdicionarCardVisible(true);
+            } else {
+                setModalVisible(true);
+            }
+        }
+    };
+
+
+    useEffect(() => {
+        console.log("Modal visibility changed:", modalVisible);
+    }, [modalVisible]);
+
+
 
     const adicionarProduto = (produto) => {
         const produtoComCategoria = { ...produto, categoria: selectedCategory }; // Adiciona a categoria ao produto
@@ -240,9 +295,9 @@ export function Home({ navigation, route }) {
                     <View style={styles.opcoesMercado}>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <TouchableOpacity style={[
-                                    styles.adicionarMercado,
-                                    selectedCategory === 'Categoria1' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria1')}>
+                                styles.adicionarMercado,
+                                selectedCategory === 'Categoria1' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria1')}>
                                 <Text style={[
                                     styles.adicionarMercadoTexto,
                                     selectedCategory === 'Categoria1' && { color: 'white' },
@@ -253,7 +308,7 @@ export function Home({ navigation, route }) {
                             <TouchableOpacity
                                 style={[
                                     styles.adicionarHortifruti,
-                                    selectedCategory === 'Categoria2' && { backgroundColor: "#7DBF4E", borderColor:"white" },
+                                    selectedCategory === 'Categoria2' && { backgroundColor: "#7DBF4E", borderColor: "white" },
                                 ]}
                                 onPress={() => handleCategoryPress('Categoria2')}>
                                 <Text style={[
@@ -263,9 +318,9 @@ export function Home({ navigation, route }) {
                             </TouchableOpacity>
 
                             <TouchableOpacity style={[
-                                    styles.adicionarAdega,
-                                    selectedCategory === 'Categoria3' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria3')} >
+                                styles.adicionarAdega,
+                                selectedCategory === 'Categoria3' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria3')} >
                                 <Text style={[
                                     styles.adicionarAdegaTexto,
                                     selectedCategory === 'Categoria3' && { color: 'white' },
@@ -274,9 +329,9 @@ export function Home({ navigation, route }) {
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
-                                    styles.adicionarPadaria,
-                                    selectedCategory === 'Categoria4' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria4')} >
+                                styles.adicionarPadaria,
+                                selectedCategory === 'Categoria4' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria4')} >
                                 <Text style={[
                                     styles.adicionarPadariaTexto,
                                     selectedCategory === 'Categoria4' && { color: 'white' },
@@ -285,9 +340,9 @@ export function Home({ navigation, route }) {
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
-                                    styles.adicionarAcougue,
-                                    selectedCategory === 'Categoria5' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria5')}>
+                                styles.adicionarAcougue,
+                                selectedCategory === 'Categoria5' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria5')}>
                                 <Text style={[
                                     styles.adicionarAcougueTexto,
                                     selectedCategory === 'Categoria5' && { color: 'white' },
@@ -296,9 +351,9 @@ export function Home({ navigation, route }) {
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
-                                    styles.adicionarMercearia,
-                                    selectedCategory === 'Categoria6' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria6')}>
+                                styles.adicionarMercearia,
+                                selectedCategory === 'Categoria6' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria6')}>
                                 <Text style={[
                                     styles.adicionarMerceariaTexto,
                                     selectedCategory === 'Categoria6' && { color: 'white' },
@@ -307,9 +362,9 @@ export function Home({ navigation, route }) {
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
-                                    styles.adicionarFrios,
-                                    selectedCategory === 'Categoria7' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria7')} >
+                                styles.adicionarFrios,
+                                selectedCategory === 'Categoria7' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria7')} >
                                 <Text style={[
                                     styles.adicionarFriosTexto,
                                     selectedCategory === 'Categoria7' && { color: 'white' },
@@ -318,9 +373,9 @@ export function Home({ navigation, route }) {
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
-                                    styles.adicionarOutros,
-                                    selectedCategory === 'Categoria8' && { backgroundColor: "#7DBF4E", borderColor:"white" },
-                                ]} onPress={() => handleCategoryPress('Categoria8')}>
+                                styles.adicionarOutros,
+                                selectedCategory === 'Categoria8' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Categoria8')}>
                                 <Text style={[
                                     styles.adicionarOutrosTexto,
                                     selectedCategory === 'Categoria8' && { color: 'white' },
@@ -333,7 +388,10 @@ export function Home({ navigation, route }) {
                 </View>
                 {selectedCategory && getCategoryScrollView(selectedCategory)}
                 <View style={styles.limparContainer}>
-                    <TouchableOpacity style={styles.apagarTudo} >
+                    <TouchableOpacity
+                        style={styles.apagarTudo}
+                        onPress={limparCategoriasSelecionadas}
+                    >
                         <Image
                             style={styles.lixo}
                             source={require('../assets/lixo.png')}
@@ -342,7 +400,67 @@ export function Home({ navigation, route }) {
                             Limpar
                         </Text>
                     </TouchableOpacity>
+
                 </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={() => setModalVisible(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Selecione as categorias a serem limpas:</Text>
+                            {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                <TouchableOpacity
+                                    key={categoria}
+                                    style={[
+                                        styles.categoriaButton,
+                                        categoriasSelecionadas.includes(categoria) && { backgroundColor: '#7DBF4E' }
+                                    ]}
+                                    onPress={() => toggleCategoriaSelecionada(categoria)}
+                                >
+                                    <Text style={styles.categoriaButtonText}>{categoria}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            <TouchableOpacity
+                                style={styles.modalButton}
+                                onPress={() => {
+                                    limparCategoriasSelecionadas();
+                                    setModalVisible(false);
+                                }}
+                            >
+
+                                <Text style={styles.modalButtonText}>Limpar Categorias</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalAdicionarCardVisible}
+                    onRequestClose={() => setModalAdicionarCardVisible(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Adicione um card antes de limpar!</Text>
+                            <TouchableOpacity
+                                style={styles.modalButton}
+                                onPress={() => setModalAdicionarCardVisible(false)}
+                            >
+                                <Text style={styles.modalButtonText}>OK</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
                 <View style={styles.containerValorTotal}>
                     <View style={styles.valorTotal}>
                         <View style={styles.resultado}>
@@ -760,16 +878,41 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
-    modalTexto: {
-        fontFamily: "Inter",
-        fontWeight: "800",
-        color: "#0B8C38"
+    modalContent: {
+        width: '80%',
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
     },
-    modalTextoSpan: {
-        fontFamily: "Inter",
-        fontWeight: "800",
-        color: "#F26E22"
-    }
-
-
+    modalTitle: {
+        fontSize: 18,
+        marginBottom: 20,
+    },
+    modalButton: {
+        backgroundColor: '#7DBF4E',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        width: '100%',
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: 'white',
+        fontSize: 16,
+    },
+    cancelButton: {
+        backgroundColor: '#B0B0B0',
+    },
+    categoriaButton: {
+        backgroundColor: '#E0E0E0',
+        padding: 10,
+        borderRadius: 5,
+        marginTop: 10,
+        width: '100%',
+        alignItems: 'center',
+    },
+    categoriaButtonText: {
+        fontSize: 16,
+    },
 });
