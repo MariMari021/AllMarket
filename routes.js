@@ -10,7 +10,6 @@ import { CardAdicionado } from './pages/cardAdicionado';
 import { Sucesso } from './pages/sucesso';
 import { Inicio } from './pages/inicio';
 import { ListaSalva } from './pages/listaSalva';
-// import { ProductProvider } from './contexts/productContext';
 
 const Stack = createStackNavigator();
 

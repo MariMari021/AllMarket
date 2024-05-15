@@ -1,8 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
+import { useRoute } from '@react-navigation/native';
 
 export function Compras() {
+  const route = useRoute();
+  const routeParams = route.params ?? {};
+  const ultimoValorLimite = routeParams.ultimoValorLimite;
 
 
   return (
@@ -21,12 +25,12 @@ export function Compras() {
           style={styles.dinheiro}
           source={require('../assets/imgValor.png')}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Digite o valor máx. da compra."
-          placeholderTextColor="#000"
+        <View>
+          <Text style={styles.InputCompras}>
+            Último valor inserido: {ultimoValorLimite}
+          </Text>
 
-        />
+        </View>
       </View>
     </ScrollView>
   );
@@ -98,5 +102,5 @@ const styles = StyleSheet.create({
     fontFamily: "Inter",
     backgroundColor: "#FFF"
   },
- 
+
 });

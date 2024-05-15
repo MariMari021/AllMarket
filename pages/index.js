@@ -12,8 +12,8 @@ export function Home({ navigation, route }) {
     const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
     const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
     const [preco, setPreco] = useState('');
-    const [valorLimite, setValorLimite] = useState(''); // Inicializa sem nenhum valor
-    // Estado para armazenar o valor limite digitado
+    const [valorLimite, setValorLimite] = useState('');
+    const [categoriasComProdutos, setCategoriaComProdutos] = useState([]);
     const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
     // Defina um estado para a quantidade do produto
     const [quantidade, setQuantidade] = useState('');
@@ -22,7 +22,48 @@ export function Home({ navigation, route }) {
     const [nomeProduto, setNomeProduto] = useState('');
     const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-   
+
+
+    const categoriasDisponiveis = ['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6','Categoria7', 'Categoria8'  ];
+
+
+     // UseEffect para atualizar as categorias com produtos sempre que houver uma mudança em produtosAdicionados
+  useEffect(() => {
+    const categoriasComProdutos = getCategoriasComProdutos();
+    setCategoriaComProdutos(categoriasComProdutos);
+  }, [produtosAdicionados]);
+
+  // Função para determinar quais categorias têm produtos adicionados
+  const getCategoriasComProdutos = () => {
+    const categoriasComProdutos = [];
+    categoriasSelecionadas.forEach(categoria => {
+      if (produtosAdicionados.some(produto => produto.categoria === categoria)) {
+        categoriasComProdutos.push(categoria);
+      }
+    });
+    return categoriasComProdutos;
+  };
+
+  // Função para lidar com a seleção de uma categoria
+  const handleCategoryPress = (categoria) => {
+    setSelectedCategory(categoria);
+    // Verifica se há produtos adicionados para a categoria selecionada
+    const hasProducts = produtosAdicionados.some(produto => produto.categoria === categoria);
+    // Adiciona a categoria à lista de categorias com produtos adicionados se houver produtos
+    if (hasProducts && !categoriasComProdutos.includes(categoria)) {
+      setCategoriaComProdutos(prevCategorias => [...prevCategorias, categoria]);
+    }
+  };
+
+
+
+    const handleValorLimiteChange = (value) => {
+        setValorLimite(value);
+    };
+
+    const handleNavigateToCompras = () => {
+        navigation.navigate('Compras', { ultimoValorLimite: valorLimite });
+    };
 
 
     useEffect(() => {
@@ -34,9 +75,6 @@ export function Home({ navigation, route }) {
     }, [produtosAdicionados]);
 
 
-    const handleCategoryPress = (category) => {
-        setSelectedCategory(category);
-    };
 
     const handleScroll = (event, category) => {
         const { contentOffset } = event.nativeEvent;
@@ -51,12 +89,6 @@ export function Home({ navigation, route }) {
         setProdutosAdicionados(produtosAdicionados.map(produto => produto.id === id ? { ...produto, quantidade: novaQuantidade } : produto));
     };
 
-    const handleNavigateToCompras = () => {
-        // Navega para a página "Compras" e passa os produtos adicionados como parâmetro
-        navigation.navigate('Compras', { produtosAdicionados: produtosAdicionados });
-
-    };
-    
     const renderCategoryScrollView = (category, imgSource) => {
         return (
             <ScrollView
@@ -180,9 +212,9 @@ export function Home({ navigation, route }) {
             setNextId(nextId + 1);
         }
     };
-    
-    
-    
+
+
+
 
     const removerProduto = (idParaRemover) => {
         // Encontra o índice do produto a ser removido
@@ -218,9 +250,11 @@ export function Home({ navigation, route }) {
     }, [produtosAdicionados]);
 
     useEffect(() => {
+        console.log('Valor limite atual:', valorLimite);
         const limite = parseFloat(valorLimite);
         setLimiteUltrapassado(totalPreco > limite);
     }, [totalPreco, valorLimite]);
+
 
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
 
@@ -250,9 +284,6 @@ export function Home({ navigation, route }) {
         return null;
     }
 
-    const handleVoltar = () => {
-        navigation.navigate('Compras'); 
-    };
 
     return (
         <ScrollView style={{ height: 50 }}>
@@ -263,11 +294,11 @@ export function Home({ navigation, route }) {
                             style={styles.profile}
                             source={require('../assets/profile.png')}
                         />
-                         <TouchableOpacity onPress={handleVoltar}>
-                        <Image 
-                            style={styles.sacola}
-                            source={require('../assets/sacola.png')}
-                        />
+                        <TouchableOpacity onPress={handleNavigateToCompras}>
+                            <Image
+                                style={styles.sacola}
+                                source={require('../assets/sacola.png')}
+                            />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.containerLogo}>
@@ -290,11 +321,12 @@ export function Home({ navigation, route }) {
                         placeholder="Digite o valor máx. da compra."
                         placeholderTextColor="#000"
                         keyboardType="numeric"
-                        onChangeText={setValorLimite}
-                        value={valorLimite.toString()}
+                        onChangeText={handleValorLimiteChange}
+                        value={valorLimite}
                     />
-
                 </View>
+                <Text>Categorias com produtos adicionados: {categoriasComProdutos.join(', ')}</Text>
+
                 <View style={styles.mercados}>
                     <Text style={styles.mercadosTitulo}>
                         Categorias
