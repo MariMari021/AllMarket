@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-// import { ScrollView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export function Cadastro() {
   const [username, setUsername] = useState('');
@@ -46,15 +47,22 @@ export function Cadastro() {
     }
   };
 
-  const handleCadastro = () => {
+  const handleCadastro = async () => {
     if (!username || !birthday || !phone || !email || !password || errorMessage) {
       setErrorMessage('Por favor, preencha todos os campos corretamente.');
       return;
     }
-
-    navigation.navigate('Sucesso');
-    setErrorMessage('');
+  
+    try {
+      // Salvando os dados do cadastro no AsyncStorage
+      await AsyncStorage.setItem('userData', JSON.stringify({ username, email, password }));
+      navigation.navigate('Sucesso');
+      setErrorMessage('');
+    } catch (error) {
+      console.error('Erro ao salvar os dados do cadastro:', error);
+    }
   };
+  
 
   return (
     // <ScrollView style={{ height: 50 }}>
@@ -176,5 +184,3 @@ const styles = StyleSheet.create({
     textAlign: 'center', // Centralizando horizontalmente
   },
 });
-
-

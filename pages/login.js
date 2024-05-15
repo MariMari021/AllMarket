@@ -1,12 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export function Login({ navigation }) {
+export function Login() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigation = useNavigation();
+
+  const handleLogin = async () => {
+    try {
+      // Recuperando os dados salvos do AsyncStorage
+      const userData = await AsyncStorage.getItem('userData');
+      if (userData) {
+        const { email: storedEmail, password: storedPassword } = JSON.parse(userData);
+        if (storedEmail === email && storedPassword === password) {
+          // Login bem sucedido
+          // Navegar para a próxima tela ou executar a ação desejada
+        } else {
+          setErrorMessage('Email ou senha inválidos.');
+        }
+      } else {
+        setErrorMessage('Nenhum usuário cadastrado.');
+      }
+    } catch (error) {
+      console.error('Erro ao recuperar os dados do cadastro:', error);
+    }
+  };
+  
 
   const navigateToCadastro = () => {
-    // Navegar para a página de cadastro
-    navigation.navigate('Cadastro'); // Certifique-se de ter definido corretamente a rota para a página de cadastro
+    navigation.navigate('Cadastro');
   };
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -18,24 +46,28 @@ export function Login({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Nome de Usuário"
-            // Aqui você pode adicionar mais propriedades conforme necessário
+            value={username}
+            onChangeText={setUsername}
           />
           <TextInput
             style={styles.input}
             placeholder="Email"
-            // Aqui você pode adicionar mais propriedades conforme necessário
+            value={email}
+            onChangeText={setEmail}
           />
           <TextInput
             style={styles.input}
             placeholder="Senha"
             secureTextEntry={true}
-            // Aqui você pode adicionar mais propriedades conforme necessário
+            value={password}
+            onChangeText={setPassword}
           />
+          {errorMessage ? (
+            <Text style={styles.errorMessage}>{errorMessage}</Text>
+          ) : null}
           <TouchableOpacity
-            style={styles.loginButton} // Aplicando o estilo do botão de login
-            onPress={() => {
-              // Adicione sua lógica de autenticação aqui
-            }}
+            style={styles.loginButton}
+            onPress={handleLogin}
           >
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
@@ -69,10 +101,9 @@ const styles = StyleSheet.create({
     paddingBottom: '5%',
     width: '100%',
     position: 'absolute',
-    bottom: -270, 
+    bottom: -270,
     alignItems: 'center',
     height: '110%',
-
   },
   welcomeText: {
     fontSize: 20,
@@ -85,11 +116,10 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#F7AB38',
     borderWidth: 1,
-    marginBottom: 30,
     paddingHorizontal: 10,
     borderRadius: 15.5,
     width: 300,
-   
+    marginBottom: 20,
   },
   loginButton: {
     backgroundColor: '#165515',
@@ -104,15 +134,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   signUpText: {
-    marginTop: 20,
     color: '#5F5F5F',
-    fontSize: 14,
+    fontSize: 16,
+    marginTop: 20,
     textAlign: 'center'
   },
   signUpLink: {
-    color: '#007BFF', // Cor azul
+    color: '#F7AB38',
     fontWeight: 'bold',
   },
+  errorMessage: {
+    color: 'red',
+    marginBottom: 10,
+  },
 });
-
-export default Login;
