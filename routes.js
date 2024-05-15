@@ -9,6 +9,7 @@ import { Produtos } from './pages/produtos';
 import { CardAdicionado } from './pages/cardAdicionado';
 import { Sucesso } from './pages/sucesso';
 import { Inicio } from './pages/inicio';
+import { ListaSalva } from './pages/listaSalva';
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,7 @@ const Navigation = () => {
             <Stack.Screen name="CardAdicionado" component={CardAdicionado} options={{ headerShown: false }} />
             <Stack.Screen name="Sucesso" component={Sucesso} options={{ headerShown: false}} />
             <Stack.Screen name="Inicio" component={Inicio} options={{ headerShown: false}} />
+            <Stack.Screen name="ListaSalva" component={ListaSalva} options={{ headerShown: false}} />
         </Stack.Navigator>
     );
 };

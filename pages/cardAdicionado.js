@@ -6,13 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 
 
 export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, onPressAdicionar, navigation }) {
-
-
+    
     const valorTotal = quantidade * preco;
-
-    // CardAdicionado.js
-
-    // CardAdicionado.js
 
     const adicionarUnidade = () => {
         const novaQuantidade = quantidade + 1;

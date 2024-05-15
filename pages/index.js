@@ -22,6 +22,33 @@ export function Home({ navigation, route }) {
     const [scrollStates, setScrollStates] = useState({});
     const [nomeProduto, setNomeProduto] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalSalvarListaVisible, setModalSalvarListaVisible] = useState(false); // Novo estado para o modal de salvamento
+    const [nomeLista, setNomeLista] = useState('');
+    const [categoriaLista, setCategoriaLista] = useState('');
+    const [listasSalvas, setListasSalvas] = useState([]);
+
+
+    const salvarLista = () => {
+        const data = new Date();
+        const novaLista = {
+            nome: nomeLista,
+            categoria: categoriaLista,
+            data: data.toLocaleDateString(),
+            produtos: produtosAdicionados
+        };
+    
+        // Atualiza o estado com a nova lista
+        setListasSalvas(prevListas => [...prevListas, novaLista]);
+    
+        // Aqui você pode limpar os campos do modal ou fazer outras ações necessárias
+        setModalSalvarListaVisible(false);
+        setNomeLista('');
+        setCategoriaLista('');
+    };
+    
+    
+    
+    
 
 
     useEffect(() => {
@@ -400,6 +427,18 @@ export function Home({ navigation, route }) {
                             Limpar
                         </Text>
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.salvarTudo}
+                        onPress={() => setModalSalvarListaVisible(true)}
+                    >
+                        <Image
+                            style={styles.lixo}
+                            source={require('../assets/adicionar.png')}
+                        />
+                        <Text style={styles.apagarTudoTexto}>
+                            Salvar lista
+                        </Text>
+                    </TouchableOpacity>
 
                 </View>
                 <Modal
@@ -446,6 +485,54 @@ export function Home({ navigation, route }) {
                 <Modal
                     animationType="slide"
                     transparent={true}
+                    visible={modalSalvarListaVisible}
+                    onRequestClose={() => {
+                        setModalSalvarListaVisible(false);
+                    }}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Informe o nome da lista:</Text>
+                            <TextInput
+                                style={styles.modalInput}
+                                value={nomeLista}
+                                onChangeText={setNomeLista}
+                                placeholder="Nome da Lista"
+                            />
+                            <Text style={styles.modalTitle}>Selecione a categoria da lista:</Text>
+                            {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                <TouchableOpacity
+                                    key={categoria}
+                                    style={[
+                                        styles.categoriaButton,
+                                        categoriaLista === categoria && { backgroundColor: '#7DBF4E' }
+                                    ]}
+                                    onPress={() => setCategoriaLista(categoria)}
+                                >
+                                    <Text style={styles.categoriaButtonText}>{categoria}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            <TouchableOpacity
+                                style={styles.modalButton}
+                                onPress={salvarLista}
+                            >
+                                <Text style={styles.modalButtonText}>Salvar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setModalSalvarListaVisible(false)}
+                            >
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
                     visible={modalAdicionarCardVisible}
                     onRequestClose={() => setModalAdicionarCardVisible(false)}
                 >
@@ -485,6 +572,7 @@ export function Home({ navigation, route }) {
                         </Text>
                     )}
                 </View>
+                <Text onPress={() => navigation.navigate('ListaSalva')}>Ir para listas</Text>
             </View>
         </ScrollView>
     );
@@ -816,8 +904,22 @@ const styles = StyleSheet.create({
         color: "white"
     },
     limparContainer: {
-        paddingStart: 40,
+        paddingStart: "6%",
+        paddingEnd: "6%",
+        flexDirection: 'row',
+        justifyContent: "space-evenly"
 
+    },
+    salvarTudo: {
+        backgroundColor: '#fff',
+        flexDirection: "row",
+        borderWidth: 1.3,
+        borderColor: 'rgba(00, 00, 00, 0.44)',
+        padding: 7,
+        width: 143,
+        justifyContent: "space-around",
+        borderRadius: 25,
+        alignItems: "center"
     },
     apagarTudo: {
         backgroundColor: '#fff',
@@ -915,4 +1017,9 @@ const styles = StyleSheet.create({
     categoriaButtonText: {
         fontSize: 16,
     },
+    modalInput: {
+        backgroundColor: "#000",
+        color: "#Fff",
+        width: 230
+    }
 });
