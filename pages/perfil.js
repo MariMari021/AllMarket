@@ -21,14 +21,11 @@ export function Perfil() {
     getUserData();
   }, []);
 
+  const [produtosAdicionados, setProdutosAdicionados] = useState([]);
 
-  const [produtosAdicionados, setProdutosAdicionados] = useState([]); // Estado para armazenar os produtos adicionados
-
-  const numProdutosAdicionados = produtosAdicionados.length; // Calcula o número de produtos adicionados
-
+  const numProdutosAdicionados = produtosAdicionados.length;
 
   const firstName = userData.username.split(' ')[0];
-
 
   return (
     <View style={styles.container}>
@@ -69,9 +66,18 @@ export function Perfil() {
       <View style={styles.sectionTitleContainer}>
         <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
       </View>
-      <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
-      <TextInput style={styles.input} placeholder="Email" value={userData.email} />
-      <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
+      <View style={styles.inputContainer}>
+        <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
+        <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
+      </View>
+      <View style={styles.inputContainer}>
+        <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
+        <TextInput style={styles.input} placeholder="Email" value={userData.email} />
+      </View>
+      <View style={styles.inputContainer}>
+        <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
+        <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
+      </View>
     </View>
   );
 }
@@ -79,22 +85,24 @@ export function Perfil() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#F9F9F9',
   },
   iconeTopo: {
-    width: 30,
-    height: 30,
+    margingTop: 10,
+    width: 35,
+    height: 35,
   },
   topBar: {
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    paddingBottom: 10,
+    padding: 20,
     marginBottom: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomEndRadius: 35,
+    borderBottomStartRadius: 35,
     backgroundColor: '#fff',
+    borderWidth: 1,
+
   },
   iconContainer: {
     flexDirection: 'row',
@@ -130,25 +138,25 @@ const styles = StyleSheet.create({
     width: '48%',
     padding: 16,
     backgroundColor: '#0B8C38',
-    borderRadius: 8,
-    alignItems: 'center',
+    borderRadius: 20,
+    // alignItems: 'center',
   },
   card2: {
     width: '48%',
     padding: 16,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    alignItems: 'center',
+    borderRadius: 20,
+    // alignItems: 'center',
     borderColor: '#ccc',
     borderWidth: 1,
   },
   cardTitle: {
-    fontSize: 16,
+    fontSize: 19,
     color: '#EAEAEA',
     fontWeight: 'bold',
   },
   cardTitle2: {
-    fontSize: 16,
+    fontSize: 19,
     color: '#5F5F5F',
     fontWeight: 'bold',
   },
@@ -157,14 +165,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   yellowText: {
-    color: '#F26E22',
+    color: '#F7AB38',
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 22,
   },
   greenText: {
     color: '#0B8C38',
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 22,
   },
   cardNumber: {
     fontSize: 45,
@@ -190,7 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#88B887',
     borderRadius: 20,
     width: 130,
-    height: 30,
+    height: 36,
   },
   button2: {
     marginTop: 10,
@@ -201,11 +209,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4884A',
     borderRadius: 20,
     width: 130,
-    height: 30,
+    height: 36,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 17,
     flex: 1,  // To make the text take up available space
     textAlign: 'center',
   },
@@ -220,19 +228,31 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
     marginRight: 5,
     color: '#5F5F5F'
   },
-  input: {
-    height: 40,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 4,
-    paddingLeft: 8,
+    borderRadius: 17,
     marginBottom: 10,
     marginHorizontal: 16,
+    paddingHorizontal: 8,
+    marginTop: 20
+  },
+  input: {
+    height: 40,
+    flex: 1,  // To make the TextInput take up available space
+    paddingLeft: 8,  // Add some padding to the TextInput for better spacing
+  },
+  inputIcon: {
+    width: 33,
+    height: 33,
+    marginRight: 8,
   },
 });
 

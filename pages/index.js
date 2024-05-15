@@ -83,6 +83,12 @@ export function Home({ navigation, route }) {
         setProdutosAdicionados(produtosAdicionados.map(produto => produto.id === id ? { ...produto, quantidade: novaQuantidade } : produto));
     };
 
+    const handleNavigateToCompras = () => {
+        // Navega para a página "Compras" e passa os produtos adicionados como parâmetro
+        navigation.navigate('Compras', { produtosAdicionados: produtosAdicionados });
+
+    };
+    
     const renderCategoryScrollView = (category, imgSource) => {
         return (
             <ScrollView
@@ -194,21 +200,21 @@ export function Home({ navigation, route }) {
 
 
     const adicionarProduto = (produto) => {
-        const produtoComCategoria = { ...produto, categoria: selectedCategory }; // Adiciona a categoria ao produto
-        console.log("Produto adicionado com categoria:", produtoComCategoria); // Log para verificar a categoria do produto
+        const produtoComCategoria = { ...produto, categoria: selectedCategory };
         const index = produtosAdicionados.findIndex(p => p.id === produto.id);
         if (index !== -1) {
-            // Editar produto existente
             const novosProdutosAdicionados = [...produtosAdicionados];
-            novosProdutosAdicionados[index] = produtoComCategoria; // Usar o produto com a categoria definida
+            novosProdutosAdicionados[index] = produtoComCategoria;
             setProdutosAdicionados(novosProdutosAdicionados);
         } else {
-            // Adicionar novo produto
-            produtoComCategoria.id = nextId; // Define um novo ID para o produto
-            setProdutosAdicionados([produtoComCategoria, ...produtosAdicionados]); // Adiciona o novo produto no início do array
-            setNextId(nextId + 1); // Incrementa o ID para o próximo produto
+            produtoComCategoria.id = nextId;
+            setProdutosAdicionados([produtoComCategoria, ...produtosAdicionados]);
+            setNextId(nextId + 1);
         }
     };
+    
+    
+    
 
     const removerProduto = (idParaRemover) => {
         // Encontra o índice do produto a ser removido
@@ -276,6 +282,10 @@ export function Home({ navigation, route }) {
         return null;
     }
 
+    const handleVoltar = () => {
+        navigation.navigate('Compras'); 
+    };
+
     return (
         <ScrollView style={{ height: 50 }}>
             <View style={styles.container}>
@@ -285,10 +295,12 @@ export function Home({ navigation, route }) {
                             style={styles.profile}
                             source={require('../assets/profile.png')}
                         />
-                        <Image
+                         <TouchableOpacity onPress={handleVoltar}>
+                        <Image 
                             style={styles.sacola}
                             source={require('../assets/sacola.png')}
                         />
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.containerLogo}>
                         <Text style={styles.bemVindo}>Seja bem-vindo ao</Text>

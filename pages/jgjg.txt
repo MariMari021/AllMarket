@@ -1,0 +1,373 @@
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View, Text, Image, TouchableOpacity, TextInput, Modal } from 'react-native';
+import { CardAdicionado } from './cardAdicionado'; // Importe o componente CardAdicionado, se necessário
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+
+export function Home({ navigation, route }) {
+    const [produtosAdicionados, setProdutosAdicionados] = useState([]);
+    const [temCardAdicionado, setTemCardAdicionado] = useState(false);
+    const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
+    const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
+    const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
+    const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
+    const [preco, setPreco] = useState('');
+    const [valorLimite, setValorLimite] = useState(''); // Inicializa sem nenhum valor
+    // Estado para armazenar o valor limite digitado
+    const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
+    // Defina um estado para a quantidade do produto
+    const [quantidade, setQuantidade] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('Categoria1'); // Define "Categoria1" como categoria inicial selecionada
+    const [scrollStates, setScrollStates] = useState({});
+    const [nomeProduto, setNomeProduto] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalSalvarListaVisible, setModalSalvarListaVisible] = useState(false); // Novo estado para o modal de salvamento
+    const [nomeLista, setNomeLista] = useState('');
+    const [categoriaLista, setCategoriaLista] = useState('');
+    const [listasSalvas, setListasSalvas] = useState([]);
+
+    const salvarLista = () => {
+        const data = new Date();
+        const novaLista = {
+            nome: nomeLista,
+            categoria: categoriaLista,
+            data: data.toLocaleDateString(),
+            produtos: produtosAdicionados
+        };
+    
+        // Atualiza o estado com a nova lista
+        setListasSalvas(prevListas => [...prevListas, novaLista]);
+    
+        // Aqui você pode limpar os campos do modal ou fazer outras ações necessárias
+        setModalSalvarListaVisible(false);
+        setNomeLista('');
+        setCategoriaLista('');
+    };
+
+    useEffect(() => {
+        // Verificar se há algum card adicionado
+        if (produtosAdicionados.length > 0) {
+            setTemCardAdicionado(true);
+        } else {
+            setTemCardAdicionado(false);
+        }
+    }, [produtosAdicionados]);
+
+    const handlePress = (option) => {
+        setSelectedOption(option);
+    };
+
+    const handleCategoryPress = (category) => {
+        setSelectedCategory(category);
+    };
+
+    const handleScroll = (event, category) => {
+        const { contentOffset } = event.nativeEvent;
+        setScrollStates(prevState => ({
+            ...prevState,
+            [category]: contentOffset
+        }));
+    };
+
+    const onPressAdicionar = (id, novaQuantidade) => {
+        // Atualize o estado de quantidade do produto com o novo valor
+        setProdutosAdicionados(produtosAdicionados.map(produto => produto.id === id ? { ...produto, quantidade: novaQuantidade } : produto));
+    };
+
+    const renderCategoryScrollView = (category, imgSource) => {
+        return (
+            <ScrollView
+                key={category}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                onScroll={(event) => handleScroll(event, category)}
+                scrollEventThrottle={16} // Ajuste conforme necessário
+            >
+                <View style={styles.cardContainer}>
+                    <View style={styles.card}>
+                        <Image
+                            style={styles.imgCardAdicionar}
+                            source={imgSource}
+                        />
+                        <Text style={styles.tituloAdicionar}>
+                            Adicionar
+                        </Text>
+                        <Text style={styles.tituloAdicionarSpan}> o produto!</Text>
+                        <TouchableOpacity style={styles.botaoMais} onPress={() => navigation.navigate('Produtos')}>
+                            <Image
+                                style={styles.maisProduto}
+                                source={require('../assets/imgMaisProduto.png')}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    {produtosAdicionados
+                        .filter(produto => produto.categoria === selectedCategory)
+                        .map((produto) => (
+                            <CardAdicionado
+                                key={produto.id}
+                                id={produto.id}
+                                nome={produto.nome}
+                                quantidade={produto.quantidade}
+                                preco={produto.preco}
+                                onPressRemover={removerProduto}
+                                onPressEditar={editarProduto}
+                                onPressAdicionar={onPressAdicionar} // Adicione essa linha
+                                navigation={navigation}
+                            />
+                        ))}
+                </View>
+            </ScrollView>
+        );
+    };
+
+    const getCategoryScrollView = (category) => {
+        switch (category) {
+            case 'Categoria1':
+                return renderCategoryScrollView(category, require('../assets/imgCard1.png'));
+            case 'Categoria2':
+                return renderCategoryScrollView(category, require('../assets/frutas.png'));
+            case 'Categoria3':
+                return renderCategoryScrollView(category, require('../assets/adega.png'));
+            case 'Categoria4':
+                return renderCategoryScrollView(category, require('../assets/padaria.png'));
+            case 'Categoria5':
+                return renderCategoryScrollView(category, require('../assets/acougue.png'));
+            case 'Categoria6':
+                return renderCategoryScrollView(category, require('../assets/mercearia.png'));
+            case 'Categoria7':
+                return renderCategoryScrollView(category, require('../assets/frios.png'));
+            case 'Categoria8':
+                return renderCategoryScrollView(category, require('../assets/outros.png'));
+            // Adicione mais casos conforme necessário para outras categorias
+            default:
+                return null;
+        }
+    };
+
+    const toggleCategoriaSelecionada = (categoria) => {
+        setCategoriasSelecionadas(prevState =>
+            prevState.includes(categoria)
+                ? prevState.filter(item => item !== categoria)
+                : [...prevState, categoria]
+        );
+    };
+
+    const limparCategoriasSelecionadas = () => {
+        if (produtosAdicionados.length > 0) {
+            const novosProdutos = produtosAdicionados.filter(produto => !categoriasSelecionadas.includes(produto.categoria));
+
+            let total = 0;
+            novosProdutos.forEach(produto => {
+                total += produto.preco * produto.quantidade;
+            });
+
+            setProdutosAdicionados(novosProdutos);
+            setTotalPreco(total);
+            setCategoriasSelecionadas([]);
+            if (total > 0) {
+                setModalVisible(true);
+            }
+        } else {
+            if (totalPreco === 0) {
+                setModalAdicionarCardVisible(true);
+            } else {
+                setModalVisible(true);
+            }
+        }
+    };
+
+    useEffect(() => {
+        console.log("Modal visibility changed:", modalVisible);
+    }, [modalVisible]);
+
+    const adicionarProduto = (produto) => {
+        const produtoComCategoria = { ...produto, categoria: selectedCategory }; // Adiciona a categoria ao produto
+        console.log("Produto adicionado com categoria:", produtoComCategoria); // Log para verificar a categoria do produto
+        const index = produtosAdicionados.findIndex(p => p.id === produto.id);
+        if (index !== -1) {
+            // Editar produto existente
+            const novosProdutosAdicionados = [...produtosAdicionados];
+            novosProdutosAdicionados[index] = produtoComCategoria; // Usar o produto com a categoria definida
+            setProdutosAdicionados(novosProdutosAdicionados);
+        } else {
+            // Adicionar novo produto
+            produtoComCategoria.id = nextId; // Define um novo ID para o produto
+            setProdutosAdicionados([produtoComCategoria, ...produtosAdicionados]); // Adiciona o novo produto no início do array
+            setNextId(nextId + 1); // Incrementa o ID para o próximo produto
+        }
+    };
+
+    const removerProduto = (idParaRemover) => {
+        // Encontra o índice do produto a ser removido
+        const indexToRemove = produtosAdicionados.findIndex(produto => produto.id === idParaRemover);
+
+        // Se o índice for encontrado, remove o produto da lista utilizando splice
+        if (indexToRemove !== -1) {
+            const newProdutosAdicionados = [...produtosAdicionados];
+            newProdutosAdicionados.splice(indexToRemove, 1); // Remove 1 elemento a partir do índice indexToRemove
+            setProdutosAdicionados(newProdutosAdicionados);
+        }
+    };
+
+    const editarProduto = (produto) => {
+        setNomeProduto(produto.nome);
+        setQuantidade(produto.quantidade);
+        setPreco(produto.preco);
+    };
+
+    useEffect(() => {
+        if (route.params && route.params.novoProduto) {
+            adicionarProduto(route.params.novoProduto);
+            route.params.novoProduto = null; // Limpa o parâmetro após adicionar
+        }
+    }, [route.params]);
+
+    useEffect(() => {
+        let total = 0;
+        produtosAdicionados.forEach(produto => {
+            total += produto.preco * produto.quantidade;
+        });
+        setTotalPreco(total);
+    }, [produtosAdicionados]);
+
+    useEffect(() => {
+        const limite = parseFloat(valorLimite);
+        setLimiteUltrapassado(totalPreco > limite);
+    }, [totalPreco, valorLimite]);
+
+    const [fontsLoaded] = useFonts({
+        'Poppins-Regular': require('../assets/fonts/Poppins-Regular.ttf'),
+        'Poppins-Bold': require('../assets/fonts/Poppins-Bold.ttf'),
+        'Poppins-Medium': require('../assets/fonts/Poppins-Medium.ttf'),
+        'Poppins-SemiBold': require('../assets/fonts/Poppins-SemiBold.ttf')
+    });
+
+    useEffect(() => {
+        if (fontsLoaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [fontsLoaded]);
+
+    if (!fontsLoaded) {
+        return null;
+    }
+
+    return (
+        <ScrollView style={styles.container}>
+            <Text style={styles.tituloPrincipal}>Olá, Fulano</Text>
+            <Text style={styles.tituloPrincipalSpan}>Vamos às compras?</Text>
+            <View style={styles.limitePreco}>
+                <Text style={styles.textoLimite}>Estabeleça um limite de gastos:</Text>
+                <TextInput
+                    style={styles.inputLimite}
+                    keyboardType="numeric"
+                    value={valorLimite}
+                    onChangeText={setValorLimite}
+                    placeholder="R$ 0,00"
+                />
+            </View>
+            <Text style={[styles.textoLimite, { marginBottom: 10 }]}>
+                Valor total da compra:
+                <Text style={[styles.totalPreco, limiteUltrapassado && styles.limiteUltrapassado]}>
+                    R$ {totalPreco.toFixed(2)}
+                </Text>
+            </Text>
+            {getCategoryScrollView(selectedCategory)}
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((category) => (
+                    <TouchableOpacity
+                        key={category}
+                        style={[
+                            styles.categoriaButton,
+                            selectedCategory === category && styles.categoriaButtonSelecionado
+                        ]}
+                        onPress={() => handleCategoryPress(category)}
+                    >
+                        <Text
+                            style={[
+                                styles.categoriaButtonText,
+                                selectedCategory === category && styles.categoriaButtonTextSelecionado
+                            ]}
+                        >
+                            {category}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+            <Modal visible={modalVisible} animationType="slide" transparent={true}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalText}>
+                            {produtosAdicionados.length === 0 ? "Adicione produtos para prosseguir" : "Deseja continuar com a exclusão?"}
+                        </Text>
+                        {produtosAdicionados.length > 0 && (
+                            <TouchableOpacity
+                                style={styles.botaoModal}
+                                onPress={() => {
+                                    limparCategoriasSelecionadas();
+                                    setModalVisible(false);
+                                }}
+                            >
+                                <Text style={styles.botaoModalTexto}>Sim</Text>
+                            </TouchableOpacity>
+                        )}
+                        <TouchableOpacity
+                            style={styles.botaoModal}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Text style={styles.botaoModalTexto}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            <Modal visible={modalAdicionarCardVisible} animationType="slide" transparent={true}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalText}>Adicione um produto primeiro!</Text>
+                        <TouchableOpacity
+                            style={styles.botaoModal}
+                            onPress={() => setModalAdicionarCardVisible(false)}
+                        >
+                            <Text style={styles.botaoModalTexto}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            <Modal visible={modalSalvarListaVisible} animationType="slide" transparent={true}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalText}>Salvar Lista</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Nome da Lista"
+                            value={nomeLista}
+                            onChangeText={setNomeLista}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Categoria"
+                            value={categoriaLista}
+                            onChangeText={setCategoriaLista}
+                        />
+                        <TouchableOpacity
+                            style={styles.botaoModal}
+                            onPress={salvarLista}
+                        >
+                            <Text style={styles.botaoModalTexto}>Salvar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.botaoModal}
+                            onPress={() => setModalSalvarListaVisible(false)}
+                        >
+                            <Text style={styles.botaoModalTexto}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        </ScrollView>
+    );
+}
+
+const styles = StyleSheet.create({
+    // Seus estilos aqui
+});

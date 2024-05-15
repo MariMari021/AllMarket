@@ -17,8 +17,8 @@ export function Login() {
       if (userData) {
         const { email: storedEmail, password: storedPassword } = JSON.parse(userData);
         if (storedEmail === email && storedPassword === password) {
-          // Login bem sucedido
-          // Navegar para a próxima tela ou executar a ação desejada
+          // Login bem-sucedido, navegar para a página Home
+          navigation.navigate('Home');
         } else {
           setErrorMessage('Email ou senha inválidos.');
         }
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   signUpLink: {
-    color: '#F7AB38',
+    color: '#0B57D0',
     fontWeight: 'bold',
   },
   errorMessage: {
