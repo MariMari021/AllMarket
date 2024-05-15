@@ -8,7 +8,6 @@ import * as SplashScreen from 'expo-splash-screen';
 export function Home({ navigation, route }) {
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
     const [temCardAdicionado, setTemCardAdicionado] = useState(false);
-    const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
     const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
     const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
     const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
@@ -21,38 +20,12 @@ export function Home({ navigation, route }) {
     const [selectedCategory, setSelectedCategory] = useState('Categoria1'); // Define "Categoria1" como categoria inicial selecionada
     const [scrollStates, setScrollStates] = useState({});
     const [nomeProduto, setNomeProduto] = useState('');
+    const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalSalvarListaVisible, setModalSalvarListaVisible] = useState(false); // Novo estado para o modal de salvamento
-    const [nomeLista, setNomeLista] = useState('');
-    const [categoriaLista, setCategoriaLista] = useState('');
-    const [listasSalvas, setListasSalvas] = useState([]);
-
-
-    const salvarLista = () => {
-        const data = new Date();
-        const novaLista = {
-            nome: nomeLista,
-            categoria: categoriaLista,
-            data: data.toLocaleDateString(),
-            produtos: produtosAdicionados
-        };
-    
-        // Atualiza o estado com a nova lista
-        setListasSalvas(prevListas => [...prevListas, novaLista]);
-    
-        // Aqui você pode limpar os campos do modal ou fazer outras ações necessárias
-        setModalSalvarListaVisible(false);
-        setNomeLista('');
-        setCategoriaLista('');
-    };
-    
-    
-    
-    
+   
 
 
     useEffect(() => {
-        // Verificar se há algum card adicionado
         if (produtosAdicionados.length > 0) {
             setTemCardAdicionado(true);
         } else {
@@ -60,11 +33,6 @@ export function Home({ navigation, route }) {
         }
     }, [produtosAdicionados]);
 
-
-
-    const handlePress = (option) => {
-        setSelectedOption(option);
-    };
 
     const handleCategoryPress = (category) => {
         setSelectedCategory(category);
@@ -427,20 +395,15 @@ export function Home({ navigation, route }) {
                             Limpar
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.salvarTudo}
-                        onPress={() => setModalSalvarListaVisible(true)}
-                    >
-                        <Image
-                            style={styles.lixo}
-                            source={require('../assets/adicionar.png')}
-                        />
-                        <Text style={styles.apagarTudoTexto}>
-                            Salvar lista
-                        </Text>
+                    <TouchableOpacity style={styles.salvarTudo}>
+                        <Image style={styles.lixo} source={require('../assets/adicionar.png')} />
+                        <Text style={styles.apagarTudoTexto}>Salvar lista</Text>
                     </TouchableOpacity>
 
+
                 </View>
+
+
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -481,54 +444,6 @@ export function Home({ navigation, route }) {
                         </View>
                     </View>
                 </Modal>
-
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={modalSalvarListaVisible}
-                    onRequestClose={() => {
-                        setModalSalvarListaVisible(false);
-                    }}
-                >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Informe o nome da lista:</Text>
-                            <TextInput
-                                style={styles.modalInput}
-                                value={nomeLista}
-                                onChangeText={setNomeLista}
-                                placeholder="Nome da Lista"
-                            />
-                            <Text style={styles.modalTitle}>Selecione a categoria da lista:</Text>
-                            {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
-                                <TouchableOpacity
-                                    key={categoria}
-                                    style={[
-                                        styles.categoriaButton,
-                                        categoriaLista === categoria && { backgroundColor: '#7DBF4E' }
-                                    ]}
-                                    onPress={() => setCategoriaLista(categoria)}
-                                >
-                                    <Text style={styles.categoriaButtonText}>{categoria}</Text>
-                                </TouchableOpacity>
-                            ))}
-                            <TouchableOpacity
-                                style={styles.modalButton}
-                                onPress={salvarLista}
-                            >
-                                <Text style={styles.modalButtonText}>Salvar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelButton]}
-                                onPress={() => setModalSalvarListaVisible(false)}
-                            >
-                                <Text style={styles.modalButtonText}>Cancelar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-
-
 
                 <Modal
                     animationType="slide"
