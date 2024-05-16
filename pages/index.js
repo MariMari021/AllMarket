@@ -24,6 +24,44 @@ export function Home({ navigation, route }) {
     const [nomeProduto, setNomeProduto] = useState('');
     const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalSalvarVisible, setModalSalvarVisible] = useState(false);
+    const [categoriaParaSalvar, setCategoriaParaSalvar] = useState('');
+    const [listasSalvas, setListasSalvas] = useState([]);
+    const [modalCategoriaJaSalvaVisible, setModalCategoriaJaSalvaVisible] = useState(false);
+    const [nomeDaLista, setNomeDaLista] = useState('');
+
+    const salvarLista = () => {
+        const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === categoriaParaSalvar);
+        if (produtosNaCategoria.length > 0) {
+            const ultimaListaSalva = listasSalvas.find(lista => lista.categoria === categoriaParaSalvar);
+
+            const produtosSaoIguais = (produtos1, produtos2) => {
+                if (produtos1.length !== produtos2.length) return false;
+                return produtos1.every((produto, index) => {
+                    return produto.id === produtos2[index].id &&
+                        produto.nome === produtos2[index].nome &&
+                        produto.quantidade === produtos2[index].quantidade &&
+                        produto.preco === produtos2[index].preco;
+                });
+            };
+
+            if (!ultimaListaSalva || !produtosSaoIguais(ultimaListaSalva.produtos, produtosNaCategoria)) {
+                const novasListasSalvas = [...listasSalvas, { nome: nomeDaLista, categoria: categoriaParaSalvar, produtos: produtosNaCategoria, data: new Date() }];
+                setListasSalvas(novasListasSalvas);
+                setModalSalvarVisible(false);
+                navigation.navigate('ListaSalva', { listasSalvas: novasListasSalvas });
+            } else {
+                setModalCategoriaJaSalvaVisible(true);
+                setModalSalvarVisible(false);
+            }
+        } else {
+            setModalSalvarVisible(false);
+        }
+    };
+
+
+
+
 
     // UseEffect para atualizar as categorias com produtos sempre que houver uma mudança em produtosAdicionados
     useEffect(() => {
@@ -55,7 +93,7 @@ export function Home({ navigation, route }) {
 
     const handleNavigateToCompras = () => {
         navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
-      };
+    };
 
 
     useEffect(() => {
@@ -188,22 +226,6 @@ export function Home({ navigation, route }) {
     useEffect(() => {
         console.log("Modal visibility changed:", modalVisible);
     }, [modalVisible]);
-
-
-
-    // const adicionarProduto = (produto) => {
-    //     const produtoComCategoria = { ...produto, categoria: selectedCategory };
-    //     const index = produtosAdicionados.findIndex(p => p.id === produto.id);
-    //     if (index !== -1) {
-    //         const novosProdutosAdicionados = [...produtosAdicionados];
-    //         novosProdutosAdicionados[index] = produtoComCategoria;
-    //         setProdutosAdicionados(novosProdutosAdicionados);
-    //     } else {
-    //         produtoComCategoria.id = nextId;
-    //         setProdutosAdicionados([produtoComCategoria, ...produtosAdicionados]);
-    //         setNextId(nextId + 1);
-    //     }
-    // };
 
 
     const adicionarProduto = (produto) => {
@@ -462,14 +484,73 @@ export function Home({ navigation, route }) {
                             Limpar
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.salvarTudo}>
+                    <TouchableOpacity onPress={() => setModalSalvarVisible(true)} style={styles.salvarTudo}>
                         <Image style={styles.lixo} source={require('../assets/adicionar.png')} />
                         <Text style={styles.apagarTudoTexto}>Salvar lista</Text>
                     </TouchableOpacity>
 
-
                 </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalSalvarVisible}
+                    onRequestClose={() => setModalSalvarVisible(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Digite o nome da lista"
+                                value={nomeDaLista}
+                                onChangeText={setNomeDaLista}
+                            />
+                            <Text style={styles.modalTitle}>Escolha a categoria para salvar a lista:</Text>
+                            {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                <TouchableOpacity
+                                    key={categoria}
+                                    style={[
+                                        styles.categoriaButton,
+                                        categoriaParaSalvar === categoria && { backgroundColor: '#7DBF4E' }
+                                    ]}
+                                    onPress={() => setCategoriaParaSalvar(categoria)}
+                                >
+                                    <Text style={styles.categoriaButtonText}>{categoria}</Text>
+                                </TouchableOpacity>
+                            ))}
+                            <TouchableOpacity
+                                style={styles.modalButton}
+                                onPress={salvarLista}
+                            >
+                                <Text style={styles.modalButtonText}>Salvar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setModalSalvarVisible(false)}
+                            >
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
 
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalCategoriaJaSalvaVisible}
+                    onRequestClose={() => setModalCategoriaJaSalvaVisible(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Categoria já salva com os mesmos produtos.</Text>
+                            <TouchableOpacity
+                                onPress={() => setModalCategoriaJaSalvaVisible(false)}
+                                style={styles.modalButton}
+                            >
+                                <Text style={styles.modalButtonText}>OK</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
 
                 <Modal
                     animationType="slide"
@@ -554,7 +635,10 @@ export function Home({ navigation, route }) {
                         </Text>
                     )}
                 </View>
-                <Text onPress={() => navigation.navigate('ListaSalva')}>Ir para listas</Text>
+                <Text style={styles.salvarTexto} onPress={() => navigation.navigate('ListaSalva', { listasSalvas })}>
+                    Ver listas salvas
+                </Text>
+
             </View>
         </ScrollView>
     );
