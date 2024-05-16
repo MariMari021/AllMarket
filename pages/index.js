@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 
 export function Home({ navigation, route }) {
+
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
     const [temCardAdicionado, setTemCardAdicionado] = useState(false);
     const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
@@ -13,6 +14,7 @@ export function Home({ navigation, route }) {
     const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
     const [preco, setPreco] = useState('');
     const [valorLimite, setValorLimite] = useState('');
+    const [categoriasComTotais, setCategoriasComTotais] = useState([]);
     const [categoriasComProdutos, setCategoriaComProdutos] = useState([]);
     const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
     // Defina um estado para a quantidade do produto
@@ -24,36 +26,30 @@ export function Home({ navigation, route }) {
     const [modalVisible, setModalVisible] = useState(false);
 
 
-    const categoriasDisponiveis = ['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6','Categoria7', 'Categoria8'  ];
+    const categoriasDisponiveis = ['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'];
 
 
-     // UseEffect para atualizar as categorias com produtos sempre que houver uma mudança em produtosAdicionados
-  useEffect(() => {
-    const categoriasComProdutos = getCategoriasComProdutos();
-    setCategoriaComProdutos(categoriasComProdutos);
-  }, [produtosAdicionados]);
+    // UseEffect para atualizar as categorias com produtos sempre que houver uma mudança em produtosAdicionados
+    useEffect(() => {
+        const categoriasComProdutos = getCategoriasComProdutos();
+        setCategoriaComProdutos(categoriasComProdutos);
+    }, [produtosAdicionados]);
 
-  // Função para determinar quais categorias têm produtos adicionados
-  const getCategoriasComProdutos = () => {
-    const categoriasComProdutos = [];
-    categoriasSelecionadas.forEach(categoria => {
-      if (produtosAdicionados.some(produto => produto.categoria === categoria)) {
-        categoriasComProdutos.push(categoria);
-      }
-    });
-    return categoriasComProdutos;
-  };
+    // Função para determinar quais categorias têm produtos adicionados
+    const getCategoriasComProdutos = () => {
+        const categoriasComProdutos = [];
+        categoriasSelecionadas.forEach(categoria => {
+            if (produtosAdicionados.some(produto => produto.categoria === categoria)) {
+                categoriasComProdutos.push(categoria);
+            }
+        });
+        return categoriasComProdutos;
+    };
 
-  // Função para lidar com a seleção de uma categoria
-  const handleCategoryPress = (categoria) => {
-    setSelectedCategory(categoria);
-    // Verifica se há produtos adicionados para a categoria selecionada
-    const hasProducts = produtosAdicionados.some(produto => produto.categoria === categoria);
-    // Adiciona a categoria à lista de categorias com produtos adicionados se houver produtos
-    if (hasProducts && !categoriasComProdutos.includes(categoria)) {
-      setCategoriaComProdutos(prevCategorias => [...prevCategorias, categoria]);
-    }
-  };
+    // Função para lidar com a seleção de uma categoria
+    const handleCategoryPress = (categoria) => {
+        setSelectedCategory(categoria);
+    };
 
 
 
@@ -62,8 +58,8 @@ export function Home({ navigation, route }) {
     };
 
     const handleNavigateToCompras = () => {
-        navigation.navigate('Compras', { ultimoValorLimite: valorLimite });
-    };
+        navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
+      };
 
 
     useEffect(() => {
@@ -199,6 +195,21 @@ export function Home({ navigation, route }) {
 
 
 
+    // const adicionarProduto = (produto) => {
+    //     const produtoComCategoria = { ...produto, categoria: selectedCategory };
+    //     const index = produtosAdicionados.findIndex(p => p.id === produto.id);
+    //     if (index !== -1) {
+    //         const novosProdutosAdicionados = [...produtosAdicionados];
+    //         novosProdutosAdicionados[index] = produtoComCategoria;
+    //         setProdutosAdicionados(novosProdutosAdicionados);
+    //     } else {
+    //         produtoComCategoria.id = nextId;
+    //         setProdutosAdicionados([produtoComCategoria, ...produtosAdicionados]);
+    //         setNextId(nextId + 1);
+    //     }
+    // };
+
+
     const adicionarProduto = (produto) => {
         const produtoComCategoria = { ...produto, categoria: selectedCategory };
         const index = produtosAdicionados.findIndex(p => p.id === produto.id);
@@ -212,6 +223,22 @@ export function Home({ navigation, route }) {
             setNextId(nextId + 1);
         }
     };
+
+    useEffect(() => {
+        const categorias = produtosAdicionados.reduce((acc, produto) => {
+            const { categoria, preco, quantidade } = produto;
+            if (!acc[categoria]) {
+                acc[categoria] = 0;
+            }
+            acc[categoria] += preco * quantidade;
+            return acc;
+        }, {});
+
+        setCategoriasComTotais(Object.entries(categorias).map(([categoria, total]) => ({
+            categoria,
+            total: total.toFixed(2) // Formata o total para duas casas decimais
+        })));
+    }, [produtosAdicionados]);
 
 
 
@@ -325,7 +352,7 @@ export function Home({ navigation, route }) {
                         value={valorLimite}
                     />
                 </View>
-                <Text>Categorias com produtos adicionados: {categoriasComProdutos.join(', ')}</Text>
+
 
                 <View style={styles.mercados}>
                     <Text style={styles.mercadosTitulo}>

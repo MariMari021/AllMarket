@@ -1,40 +1,92 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
-import { useRoute } from '@react-navigation/native';
 
-export function Compras() {
-  const route = useRoute();
+export function Compras({ route }) {
   const routeParams = route.params ?? {};
   const ultimoValorLimite = routeParams.ultimoValorLimite;
+  const { categoriasComTotais = [] } = route.params || {};
+  const [categoriaMenorValor, setCategoriaMenorValor] = useState(null);
+  const [categoriaMaiorValor, setCategoriaMaiorValor] = useState(null);
 
+  useEffect(() => {
+    if (categoriasComTotais.length > 0) {
+      const categoriaMenor = categoriasComTotais.reduce((prev, curr) => {
+        return parseFloat(curr.total) < parseFloat(prev.total) ? curr : prev;
+      });
+      setCategoriaMenorValor(categoriaMenor);
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.topBar}>
-        <View style={styles.iconContainer}>
-          <Image source={require('../assets/profile.png')} style={styles.iconeTopo} />
-          <Image source={require('../assets/logo.png')} style={styles.iconeTopo2} />
-        </View>
-        <View style={styles.header}>
-          <Text style={styles.greeting}><Text style={styles.greenText}>Verifique aqui </Text>qual é a melhor opção para você!</Text>
-        </View>
-      </View>
-      <View style={styles.precoMax}>
-        <Image
-          style={styles.dinheiro}
-          source={require('../assets/imgValor.png')}
-        />
-        <View>
-          <Text style={styles.InputCompras}>
-            Último valor inserido: {ultimoValorLimite}
-          </Text>
+      const categoriaMaior = categoriasComTotais.reduce((prev, curr) => {
+        return parseFloat(curr.total) > parseFloat(prev.total) ? curr : prev;
+      });
+      setCategoriaMaiorValor(categoriaMaior);
+    }
+  }, [categoriasComTotais]);
 
+  const nenhumValorDefinido =
+    !ultimoValorLimite &&
+    categoriasComTotais.length === 0 &&
+    !categoriaMenorValor &&
+    !categoriaMaiorValor;
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.topBar}>
+          <View style={styles.iconContainer}>
+            <Image source={require('../assets/profile.png')} style={styles.iconeTopo} />
+            <Image source={require('../assets/logo.png')} style={styles.iconeTopo2} />
+          </View>
+          <View style={styles.header}>
+            <Text style={styles.greeting}>
+              <Text style={styles.greenText}>Verifique aqui </Text>
+              qual é a melhor opção para você!
+            </Text>
+          </View>
         </View>
-      </View>
-    </ScrollView>
-  );
-}
+        {nenhumValorDefinido ? (
+          <Text>Nenhum valor foi definido</Text>
+        ) : (
+          <>
+            <View>
+              <Image
+                style={styles.dinheiro}
+                source={require('../assets/imgValor.png')}
+              />
+              <View>
+                {ultimoValorLimite ? (
+                  <Text>Último valor limite: {ultimoValorLimite}</Text>
+                ) : (
+                  <Text>Valor não definido</Text>
+                )}
+              </View>
+              <View>
+                <Text>Categorias com produtos adicionados:</Text>
+                {categoriasComTotais.length > 0 ? (
+                  categoriasComTotais.map(({ categoria, total }, index) => (
+                    <View key={index}>
+                      <Text style={{ marginRight: 5 }}>{categoria}:</Text>
+                      <Text>R${total}</Text>
+                    </View>
+                  ))
+                ) : (
+                  <Text>Nenhum produto adicionado.</Text>
+                )}
+              </View>
+              {categoriaMenorValor ? (
+                <Text>Categoria com menor valor: {categoriaMenorValor.categoria} com R${categoriaMenorValor.total}</Text>
+              ) : (
+                <Text>Nenhuma categoria com valor definido.</Text>
+              )}
+              {categoriaMaiorValor ? (
+                <Text>Categoria com maior valor: {categoriaMaiorValor.categoria} com R${categoriaMaiorValor.total}</Text>
+              ) : (
+                <Text>Nenhuma categoria com valor definido.</Text>
+              )}
+            </View>
+          </>
+        )}
+      </ScrollView>
+    );
+  };
 
 const styles = StyleSheet.create({
   container: {
