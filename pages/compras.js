@@ -23,10 +23,8 @@ export function Compras({ route }) {
   }, [categoriasComTotais]);
 
   const nenhumValorDefinido =
-    !ultimoValorLimite &&
-    categoriasComTotais.length === 0 &&
-    !categoriaMenorValor &&
-    !categoriaMaiorValor;
+    (!ultimoValorLimite && categoriasComTotais.length === 0) ||
+    (ultimoValorLimite && categoriasComTotais.length === 0 && !categoriaMenorValor && !categoriaMaiorValor);
 
   return (
     <ScrollView style={styles.container}>
@@ -44,71 +42,85 @@ export function Compras({ route }) {
           </View>
         </View>
 
-       
-          {nenhumValorDefinido ? (
-            <Text>Nenhum valor foi definido</Text>
-          ) : (
-            <>
-              <View>
-                <Image
-                  style={styles.dinheiro}
-                  source={require('../assets/imgValor.png')}
-                />
-                <View>
-                  {ultimoValorLimite ? (
-                    <Text>Último valor limite: {ultimoValorLimite}</Text>
-                  ) : (
-                    <Text>Valor não definido</Text>
-                  )}
-                </View>
-                <View>
-                  <Text style={styles.categorias}>Categorias</Text>
-                  {categoriasComTotais.length > 0 ? (
-                    categoriasComTotais.map(({ categoria, total }, index) => (
-                      <View key={index} >
-                        <Text style={styles.categoriaLabel}>{categoria}:</Text>
-
-                        <View style={styles.valorContainer}>
-                          <Image
-                            source={require('../assets/dinheiro2.png')} // Substitua 'sua_imagem.png' pelo nome do arquivo de imagem
-                            style={styles.valorIcone}
-                          />
-                          <Text style={styles.valorText}>R$</Text>
-                          <Text style={styles.valorText}>{total}</Text>
-                        </View>
-
-                      </View>
-                    ))
-                  ) : (
-                    <Text>Nenhum produto adicionado.</Text>
-                  )}
-                </View>
-                <View>
-                  {categoriaMenorValor ? (
-                    <View>
-                      <Text style={styles.caixaTextoFora}>Categoria + barata</Text>
-                      <View style={styles.caixa}>
-                        <Text style={styles.caixaTexto}>{categoriaMenorValor.categoria} R${categoriaMenorValor.total}</Text>
-                      </View>
-                    </View>
-                  ) : (
-                    <Text>Nenhuma categoria com valor definido.</Text>
-                  )}
-                  {categoriaMaiorValor ? (
-                    <View>
-                      <Text style={styles.caixaTextoFora}>Categoria + cara</Text>
-                      <View style={styles.caixa}>
-                        <Text style={styles.caixaTexto}>{categoriaMaiorValor.categoria} R${categoriaMaiorValor.total}</Text>
-                      </View>
-                    </View>
-                  ) : (
-                    <Text>Nenhuma categoria com valor definido.</Text>
-                  )}
-                </View>
+        {nenhumValorDefinido ? (
+          <View style={styles.mensagemContainer}>
+            <Text style={styles.mensagem}>
+              <Text style={styles.nenhumText}>Nenhum </Text>
+              <Text style={styles.valorText}>valor ou {'\n'}categoria definidos.</Text>
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View style={[styles.precoMax, styles.spacing]}>
+              <Image
+                style={styles.dinheiro}
+                source={require('../assets/imgValor.png')}
+              />
+              <View style={styles.info}>
+                {ultimoValorLimite ? (
+                  <Text style={styles.spacing}>Último valor limite: {ultimoValorLimite}</Text>
+                ) : (
+                  <Text style={styles.spacing}>Valor não definido</Text>
+                )}
               </View>
-            </>
-          )}
-        </View>
+            </View>
+
+            <View style={styles.spacing}>
+              <Text style={[styles.categorias, styles.spacing]}>Categorias</Text>
+              {categoriasComTotais.length > 0 ? (
+                categoriasComTotais.map(({ categoria, total }, index) => (
+                  <View key={index} style={styles.spacing}>
+                    <Text style={styles.categoriaLabel}>{categoria}:</Text>
+                    <View style={styles.valorContainer}>
+                      <Image
+                        source={require('../assets/dinheiro2.png')}
+                        style={styles.valorIcone}
+                      />
+                      <Text style={styles.valorText}>R$</Text>
+                      <Text style={styles.valorText}>{total}</Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text style={styles.spacing}>Nenhum produto adicionado.</Text>
+              )}
+            </View>
+
+            <View style={styles.spacing}>
+              {categoriaMenorValor ? (
+                <View style={styles.spacing}>
+                  <Text style={styles.caixaTextoFora}>Categoria + barata</Text>
+                  <View style={styles.caixa}>
+                    <Image
+                      source={require('../assets/dinheiro.png')}
+                      style={styles.caixaIcone}
+                    />
+                    <Text style={styles.caixaTexto}>{categoriaMenorValor.categoria}</Text>
+                    <Text style={styles.caixaValor}>R${categoriaMenorValor.total}</Text>
+                  </View>
+                </View>
+              ) : (
+                <Text style={styles.spacing}>Nenhuma categoria com valor definido.</Text>
+              )}
+              {categoriaMaiorValor ? (
+                <View style={styles.spacing}>
+                  <Text style={styles.caixaTextoFora}>Categoria + cara</Text>
+                  <View style={styles.caixa}>
+                    <Image
+                      source={require('../assets/dinheiro.png')}
+                      style={styles.caixaIcone}
+                    />
+                    <Text style={styles.caixaTexto}>{categoriaMaiorValor.categoria}</Text>
+                    <Text style={styles.caixaValor}>R${categoriaMaiorValor.total}</Text>
+                  </View>
+                </View>
+              ) : (
+                <Text style={styles.spacing}>Nenhuma categoria com valor definido.</Text>
+              )}
+            </View>
+          </>
+        )}
+      </View>
     </ScrollView>
   );
 };
@@ -121,7 +133,6 @@ const styles = StyleSheet.create({
   centralizarConteudo: {
     alignItems: 'center',
   },
-
   iconeTopo: {
     marginTop: 10,
     width: 42,
@@ -168,13 +179,26 @@ const styles = StyleSheet.create({
   },
   categorias: {
     fontWeight: 'bold',
-    fontSize: 24,
+    fontSize: 26,
     color: '#165515'
   },
   dinheiro: {
     width: 43,
     height: 43,
     marginRight: 15
+  },
+  info: {
+    width: 248,
+    height: 43,
+    paddingLeft: 20,
+    padding: 10, 
+    borderWidth: 0.70,
+    borderColor: "#B8C8B7",
+    borderRadius: 25,
+    color: "#000",
+    fontFamily: "Inter",
+    alignItems: 'flex-start',
+    backgroundColor: "#FFF"
   },
   input: {
     flex: 1,
@@ -189,55 +213,86 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF"
   },
   categoriaLabel: {
-    backgroundColor: '#7DBF4E', // cor de fundo verde
-    color: '#FFFFFF', // cor do texto branca
-    padding: 5, // espaçamento interno
-    borderRadius: 15, // borda arredondada
-    marginRight: 5, // margem à direita
+    backgroundColor: '#7DBF4E',
+    color: '#FFFFFF', 
+    padding: 5,
+    borderRadius: 15, 
+    marginRight: 5, 
     width: 130,
     height: 32,
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 17,
     textAlign: 'center'
   },
   valorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // para distribuir o espaço entre os elementos
-    borderRadius: 15, // borda arredondada
-    paddingVertical: 5, // espaçamento vertical interno
-    paddingHorizontal: 10, // espaçamento horizontal interno
-    marginRight: 5, // margem à direita
-    backgroundColor: '#FFFFFF', // cor de fundo branca
-    borderWidth: 1, // largura da borda
-    borderColor: '#7DBF4E', // cor da borda verde
-    width: 280,
+    justifyContent: 'space-between', 
+    borderRadius: 15, 
+    paddingVertical: 5, 
+    paddingHorizontal: 10, 
+    marginRight: 5, 
+    backgroundColor: '#FFFFFF', 
+    borderWidth: 1, 
+    borderColor: '#7DBF4E', 
+    width: 316,
+    top: 20,
+    marginBottom: 40
   },
   valorIcone: {
-    width: 34, // ajuste conforme necessário
-    height: 34, // ajuste conforme necessário
+    width: 39, 
+    height: 39, 
   },
   valorText: {
-    color: '#0B8C38', // cor do texto verde
+    color: '#5F5F5F', 
     fontWeight: 'bold',
+    fontSize: 22
   },
   caixa: {
-    backgroundColor: '#165515', // cor de fundo verde
-    padding: 10, // espaçamento interno
-    borderRadius: 5, // borda arredondada
-    marginBottom: 10, // margem inferior
-    width: 280,
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    backgroundColor: '#165515', 
+    padding: 10,
+    borderRadius: 5, 
+    marginBottom: 10,
+    width: 316,
+    top: 20
   },
   caixaTexto: {
-    color: '#FFFFFF', // cor do texto branco
+    color: '#FFFFFF', 
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 22
   },
   caixaTextoFora: {
     fontWeight: 'bold',
-    fontSize: 24,
+    fontSize: 26,
     color: '#5F5F5F'
   },
-
+  caixaIcone: {
+    width: 39, 
+    height: 39, 
+    marginRight: 10, 
+  },
+  caixaValor: {
+    color: '#FFFFFF', 
+    fontWeight: 'bold',
+    fontSize: 20
+  },
+  spacing: {
+    marginBottom: 35, 
+  },
+  mensagemContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 200, 
+  },
+  mensagem: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  nenhumText: {
+    color: 'orange', 
+  },
 });
-
