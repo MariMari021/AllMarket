@@ -25,10 +25,6 @@ export function Home({ navigation, route }) {
     const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
-
-    const categoriasDisponiveis = ['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'];
-
-
     // UseEffect para atualizar as categorias com produtos sempre que houver uma mudança em produtosAdicionados
     useEffect(() => {
         const categoriasComProdutos = getCategoriasComProdutos();
