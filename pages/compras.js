@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     height: 39, 
   },
   valorText: {
-    color: '#5F5F5F', 
+    color: '#165515', 
     fontWeight: 'bold',
     fontSize: 22
   },
