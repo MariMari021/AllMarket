@@ -31,6 +31,7 @@ export function Home({ route, navigation }) {
     const [categoriaParaSalvar, setCategoriaParaSalvar] = useState('');
     const [nomeDaLista, setNomeDaLista] = useState('');
     const [listasSalvas, setListasSalvas] = useState([]);
+    
 
     useFocusEffect(
         React.useCallback(() => {
@@ -55,9 +56,16 @@ export function Home({ route, navigation }) {
         setModalSalvarVisible(false);
     };
 
-    const atualizarListas = (novasListas) => {
-        setListasSalvas(novasListas);
+    const navegarLista = () => {
+        const atualizarListas = (novasListas) => {
+            setListasSalvas(novasListas);
+        };
+    
+        navigation.navigate('ListaSalva', { listasSalvas, atualizarListas });
     };
+    
+    
+    
 
 
 
@@ -676,7 +684,7 @@ export function Home({ route, navigation }) {
                     )}
                 </View>
 
-                <Text style={styles.salvarTexto} onPress={() => navigation.navigate('ListaSalva', { listasSalvas, atualizarListas })}>
+                <Text style={styles.salvarTexto} onPress={navegarLista}>
                     Ver listas salvas
                 </Text>
 

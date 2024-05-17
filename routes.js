@@ -10,13 +10,14 @@ import { CardAdicionado } from './pages/cardAdicionado';
 import { Sucesso } from './pages/sucesso';
 import { Inicio } from './pages/inicio';
 import { ListaSalva } from './pages/listaSalva';
+import { Tutorial } from './pages/tutorial';
 
 const Stack = createStackNavigator();
 
 const Navigation = () => {
     return (
 
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Tutorial">
             <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
             <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
             <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
@@ -27,6 +28,7 @@ const Navigation = () => {
             <Stack.Screen name="Inicio" component={Inicio} options={{ headerShown: false}} />
             <Stack.Screen name="ListaSalva" component={ListaSalva} options={{ headerShown: false}} />
             <Stack.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
+            <Stack.Screen name="Tutorial" component={Tutorial} options={{ headerShown: false }} />
         </Stack.Navigator>
     );
 };
