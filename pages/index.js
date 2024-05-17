@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, Image, TouchableOpacity, TextInput, Modal } from 'react-native';
 import { CardAdicionado } from './cardAdicionado'; // Importe o componente CardAdicionado, se necessário
 import { useFonts } from 'expo-font';
+import { useFocusEffect } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 
 
-export function Home({ navigation, route }) {
-
+export function Home({ route, navigation }) {
+    const [modalNenhumProdutoVisible, setModalNenhumProdutoVisible] = useState(false);
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
     const [temCardAdicionado, setTemCardAdicionado] = useState(false);
     const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
@@ -24,42 +25,39 @@ export function Home({ navigation, route }) {
     const [nomeProduto, setNomeProduto] = useState('');
     const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalListaSalva, setModalListaSalva] = useState(false);
+    const [modalCategoriaJaSalvaVisible, setModalCategoriaJaSalvaVisible] = useState(false);
     const [modalSalvarVisible, setModalSalvarVisible] = useState(false);
     const [categoriaParaSalvar, setCategoriaParaSalvar] = useState('');
-    const [listasSalvas, setListasSalvas] = useState([]);
-    const [modalCategoriaJaSalvaVisible, setModalCategoriaJaSalvaVisible] = useState(false);
     const [nomeDaLista, setNomeDaLista] = useState('');
+    const [listasSalvas, setListasSalvas] = useState([]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if (route.params?.listasSalvas) {
+                setListasSalvas(route.params.listasSalvas);
+            }
+        }, [route.params?.listasSalvas])
+    );
 
     const salvarLista = () => {
         const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === categoriaParaSalvar);
         if (produtosNaCategoria.length > 0) {
-            const ultimaListaSalva = listasSalvas.find(lista => lista.categoria === categoriaParaSalvar);
-
-            const produtosSaoIguais = (produtos1, produtos2) => {
-                if (produtos1.length !== produtos2.length) return false;
-                return produtos1.every((produto, index) => {
-                    return produto.id === produtos2[index].id &&
-                        produto.nome === produtos2[index].nome &&
-                        produto.quantidade === produtos2[index].quantidade &&
-                        produto.preco === produtos2[index].preco;
-                });
+            const novaLista = {
+                nome: nomeDaLista,
+                categoria: categoriaParaSalvar,
+                produtos: produtosNaCategoria,
+                data: new Date().toISOString() // Convertendo data para string
             };
-
-            if (!ultimaListaSalva || !produtosSaoIguais(ultimaListaSalva.produtos, produtosNaCategoria)) {
-                const novasListasSalvas = [...listasSalvas, { nome: nomeDaLista, categoria: categoriaParaSalvar, produtos: produtosNaCategoria, data: new Date() }];
-                setListasSalvas(novasListasSalvas);
-                setModalSalvarVisible(false);
-                navigation.navigate('ListaSalva', { listasSalvas: novasListasSalvas });
-            } else {
-                setModalCategoriaJaSalvaVisible(true);
-                setModalSalvarVisible(false);
-            }
-        } else {
-            setModalSalvarVisible(false);
+            setListasSalvas([...listasSalvas, novaLista]);
+            setModalListaSalva(true);
         }
+        setModalSalvarVisible(false);
     };
 
-
+    const atualizarListas = (novasListas) => {
+        setListasSalvas(novasListas);
+    };
 
 
 
@@ -490,6 +488,29 @@ export function Home({ navigation, route }) {
                     </TouchableOpacity>
 
                 </View>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalListaSalva}
+                    onRequestClose={() => setModalListaSalva(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Lista Salva!</Text>
+                            <TouchableOpacity
+                                style={styles.modalButton}
+                                onPress={() => {
+                                    setModalListaSalva(false);
+                                    navigation.navigate('ListaSalva', { listasSalvas: listasSalvas });
+                                }}
+                            >
+                                <Text style={styles.modalButtonText}>Acessar Lista Salva</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -544,6 +565,25 @@ export function Home({ navigation, route }) {
                             <Text style={styles.modalTitle}>Categoria já salva com os mesmos produtos.</Text>
                             <TouchableOpacity
                                 onPress={() => setModalCategoriaJaSalvaVisible(false)}
+                                style={styles.modalButton}
+                            >
+                                <Text style={styles.modalButtonText}>OK</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalNenhumProdutoVisible}
+                    onRequestClose={() => setModalNenhumProdutoVisible(false)}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Nenhum produto adicionado na categoria selecionada.</Text>
+                            <TouchableOpacity
+                                onPress={() => setModalNenhumProdutoVisible(false)}
                                 style={styles.modalButton}
                             >
                                 <Text style={styles.modalButtonText}>OK</Text>
@@ -635,9 +675,11 @@ export function Home({ navigation, route }) {
                         </Text>
                     )}
                 </View>
-                <Text style={styles.salvarTexto} onPress={() => navigation.navigate('ListaSalva', { listasSalvas })}>
+
+                <Text style={styles.salvarTexto} onPress={() => navigation.navigate('ListaSalva', { listasSalvas, atualizarListas })}>
                     Ver listas salvas
                 </Text>
+
 
             </View>
         </ScrollView>
