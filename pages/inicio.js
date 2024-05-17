@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
         marginTop: 50,
-        marginBottom: 95
+        marginBottom: 65
     },
     orangeText: {
         color: '#F26E22',

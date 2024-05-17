@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -270,
     alignItems: 'center',
-    height: '110%',
+    height: '120%',
   },
   welcomeText: {
     fontSize: 20,
