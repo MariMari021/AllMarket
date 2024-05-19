@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -36,6 +36,7 @@ export function Login() {
   };
 
   return (
+    
     <View style={styles.container}>
       <ImageBackground
         source={require('../assets/login.png')}
@@ -79,6 +80,7 @@ export function Login() {
         </View>
       </ImageBackground>
     </View>
+    
   );
 };
 
@@ -103,7 +105,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -270,
     alignItems: 'center',
-    height: '120%',
+    height: '130%',
   },
   welcomeText: {
     fontSize: 20,

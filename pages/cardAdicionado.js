@@ -3,24 +3,25 @@ import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, onPressAdicionar, navigation }) {
-    
+
     const valorTotal = quantidade * preco;
 
-    const adicionarUnidade = () => {
+    const adicionarUnidade = async () => {
         const novaQuantidade = quantidade + 1;
+        await AsyncStorage.setItem(`produto_${id}`, JSON.stringify(novaQuantidade));
         onPressAdicionar(id, novaQuantidade);
     };
 
-    const removerUnidade = () => {
+    const removerUnidade = async () => {
         if (quantidade > 1) {
             const novaQuantidade = quantidade - 1;
+            await AsyncStorage.setItem(`produto_${id}`, JSON.stringify(novaQuantidade));
             onPressAdicionar(id, novaQuantidade);
         }
     };
-
 
     const nomeFormatado = nome.charAt(0).toUpperCase() + nome.slice(1);
 
@@ -36,6 +37,8 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
         return null;
     }
 
+    
+
     return (
         <View style={styles.cardAdicionado} onLayout={onLayoutRootView}>
             <Image
@@ -44,13 +47,13 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
             />
             <Text style={styles.tituloAdicionar}>{nomeFormatado}</Text>
             <View style={styles.valores}>
-                <TouchableOpacity style={styles.botaoMaisProduto} onPress={adicionarUnidade}>
+                <TouchableOpacity style={styles.botaoMaisProduto} onPress={() => onPressAdicionar (id)}>
                     <Image style={styles.botaoMaisProduto}
                         source={require('../assets/botaoMais.png')}
                     />
                 </TouchableOpacity>
                 <Text style={styles.quantidade}>{quantidade}</Text>
-                <TouchableOpacity style={styles.botaoMenosProduto} onPress={removerUnidade}>
+                <TouchableOpacity style={styles.botaoMenosProduto} onPress={() => onPressRemover(id)}>
                     <Image style={styles.botaoMenosProduto}
                         source={require('../assets/botaoMenos.png')}
                     />
@@ -58,7 +61,7 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
             </View>
             <Text style={styles.valorProduto}>R$ {valorTotal.toFixed(2)}</Text>
             <View style={styles.apagarEditar}>
-                <TouchableOpacity style={styles.botaoEditar} onPress={() => onPressRemover(id)}>
+                <TouchableOpacity style={styles.botaoEditar}    onPress={() => onPressRemoverCard(id)}>
                     <Image
                         style={styles.remover}
                         source={require('../assets/apagarCard.png')}
@@ -160,6 +163,4 @@ const styles = StyleSheet.create({
         alignSelf: "flex-end",
         paddingBottom: 15
     }
-
-
-})
+});

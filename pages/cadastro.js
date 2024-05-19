@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -65,7 +65,7 @@ export function Cadastro() {
   
 
   return (
-    // <ScrollView style={{ height: 50 }}>
+    <ScrollView style={{ height: 50 }}>
     <View style={styles.container}>
       <ImageBackground
         source={require('../assets/cadastro.png')}
@@ -119,7 +119,7 @@ export function Cadastro() {
         </View>
       </ImageBackground>
     </View>
-    // </ScrollView>
+    </ScrollView>
   );
 };
 
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     width: '100%',
-    height: '60%',
+    height: '70%',
     resizeMode: 'cover',
   },
   containerForm: {
@@ -141,8 +141,8 @@ const styles = StyleSheet.create({
     paddingTop: '10%',
     paddingBottom: '5%',
     width: '100%',
-    position: 'absolute',
-    bottom: -300,
+    position: 'relative',
+    bottom: -200,
     alignItems: 'center',
     height: '120%'
   },
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     color: '#5F5F5F'
   },
   input: {
-    height: 40,
+    height: 60, //40
     borderColor: '#F7AB38',
     borderWidth: 1,
     paddingHorizontal: 10,
@@ -167,7 +167,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
     borderRadius: 8,
-    width: 300
+    width: 300,
+    marginBottom: 30
   },
   buttonText: {
     color: '#FFF',

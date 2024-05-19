@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function ListaSalva({ route }) {
     const navigation = useNavigation();
@@ -13,8 +13,32 @@ export function ListaSalva({ route }) {
     useEffect(() => {
         if (route.params?.listasSalvas) {
             setListasSalvas(route.params.listasSalvas);
+            salvarListas(route.params.listasSalvas); // Salva as listas ao receber novas do parâmetro
         }
     }, [route.params?.listasSalvas]);
+
+    useEffect(() => {
+        carregarListasSalvas(); // Carrega as listas salvas ao iniciar o componente
+    }, []);
+
+    const salvarListas = async (listas) => {
+        try {
+            await AsyncStorage.setItem('listasSalvas', JSON.stringify(listas));
+        } catch (error) {
+            console.error('Erro ao salvar as listas: ', error);
+        }
+    };
+
+    const carregarListasSalvas = async () => {
+        try {
+            const listasSalvasString = await AsyncStorage.getItem('listasSalvas');
+            if (listasSalvasString !== null) {
+                setListasSalvas(JSON.parse(listasSalvasString));
+            }
+        } catch (error) {
+            console.error('Erro ao carregar as listas salvas: ', error);
+        }
+    };
 
     const handleListaPress = (lista) => {
         setSelectedLista(lista);
@@ -26,6 +50,7 @@ export function ListaSalva({ route }) {
         setListasSalvas(novasListas);
         setModalVisible(false);
         setModalExcluirVisible(false);
+        salvarListas(novasListas); // Salva as listas após excluir
         if (route.params?.atualizarListas) {
             route.params.atualizarListas(novasListas);
         }

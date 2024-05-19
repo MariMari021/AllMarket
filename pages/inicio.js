@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Image, ScrollView } from 'react-native';
 
 export function Inicio({ navigation }) {
     const handleLoginPress = () => {
@@ -11,6 +11,7 @@ export function Inicio({ navigation }) {
     };
 
     return (
+        <ScrollView style={{ height: 50 }}>
         <View style={styles.container}>
             <View style={styles.parteBranca}>
                 <View style={styles.header}>
@@ -27,6 +28,7 @@ export function Inicio({ navigation }) {
                 <Text style={styles.buttonText}>Fazer Login</Text>
             </TouchableOpacity>
         </View>
+        </ScrollView>
     );
 };
 
@@ -77,8 +79,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         alignItems: 'center',
-        marginTop: 50,
-        marginBottom: 65
+        marginTop: 40,
+        marginBottom: 45
     },
     orangeText: {
         color: '#F26E22',

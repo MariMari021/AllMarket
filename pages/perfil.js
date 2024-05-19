@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function Perfil() {
@@ -8,7 +8,6 @@ export function Perfil() {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        // Recuperando os dados salvos do AsyncStorage
         const storedUserData = await AsyncStorage.getItem('userData');
         if (storedUserData) {
           setUserData(JSON.parse(storedUserData));
@@ -27,7 +26,17 @@ export function Perfil() {
 
   const firstName = userData.username.split(' ')[0];
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userData');
+      setUserData({ username: '', email: '', password: '' });
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
   return (
+    <ScrollView style={{ height: 50 }}>
     <View style={styles.container}>
       <View style={styles.topBar}>
         <View style={styles.iconContainer}>
@@ -35,10 +44,14 @@ export function Perfil() {
           <Image source={require('../assets/sacola.png')} style={styles.iconeTopo} />
         </View>
         <View style={styles.header}>
-          <Text style={styles.greeting}>Olá, <Text style={styles.userName}>{firstName}</Text> <Image source={require('../assets/ola.png')} style={styles.ola} /> </Text>
+        <Text style={styles.greeting}>Olá, {userData.username ? userData.username.split(' ')[0] : 'usuário'} <Image source={require('../assets/ola.png')} style={styles.ola} /> </Text>
+
+
           <Text style={styles.subtitle}>Consulte os seus dados.</Text>
         </View>
+       
       </View>
+     
       <View style={styles.cardContainer}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text> adicionados</Text>
@@ -78,7 +91,11 @@ export function Perfil() {
         <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
         <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
       </View>
+      <TouchableOpacity onPress={handleLogout}>
+          <Text style={styles.logoutButton}>Sair do login</Text>
+        </TouchableOpacity>
     </View>
+    </ScrollView>
   );
 }
 
@@ -88,7 +105,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F9',
   },
   iconeTopo: {
-    margingTop: 10,
+    marginTop: 10,
     width: 35,
     height: 35,
   },
@@ -102,7 +119,6 @@ const styles = StyleSheet.create({
     borderBottomStartRadius: 35,
     backgroundColor: '#fff',
     borderWidth: 1,
-
   },
   iconContainer: {
     flexDirection: 'row',
@@ -139,14 +155,12 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#0B8C38',
     borderRadius: 20,
-    // alignItems: 'center',
   },
   card2: {
     width: '48%',
     padding: 16,
     backgroundColor: '#fff',
     borderRadius: 20,
-    // alignItems: 'center',
     borderColor: '#ccc',
     borderWidth: 1,
   },
@@ -214,7 +228,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 17,
-    flex: 1,  // To make the text take up available space
+    flex: 1,
     textAlign: 'center',
   },
   buttonIcon: {
@@ -246,13 +260,38 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    flex: 1,  // To make the TextInput take up available space
-    paddingLeft: 8,  // Add some padding to the TextInput for better spacing
+    flex: 1,
+    paddingLeft: 8,
   },
   inputIcon: {
     width: 33,
     height: 33,
     marginRight: 8,
   },
+  logoutButton: {
+    backgroundColor: '#fff',
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#F4884A', // Cor laranja
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingVertical: 8, // Ajuste a altura conforme necessário
+    paddingHorizontal: 12, // Ajuste a largura conforme necessário
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginBottom: 20,
+    marginHorizontal: 16,
+  },
+  
+  
+  
 });
+
 
