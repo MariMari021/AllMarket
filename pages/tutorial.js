@@ -95,7 +95,7 @@ export function Tutorial({navigation}) {
           </Swiper>
         </View>
         <View style={styles.botao}>
-          <TouchableOpacity style={styles.fim}onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity style={styles.fim}onPress={() =>  navigation.navigate('Main', { screen: 'Home' })}>
             <Text style={styles.fimTexto}>Criar listas!</Text>
           </TouchableOpacity>
         </View>

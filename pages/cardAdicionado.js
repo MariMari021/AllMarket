@@ -23,8 +23,17 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
         }
     };
 
-    const nomeFormatado = nome.charAt(0).toUpperCase() + nome.slice(1);
+    const nomeFormatado = (() => {
+        let formattedName = nome.charAt(0).toUpperCase() + nome.slice(1);
+        
+        if (formattedName.length > 10) {
+            formattedName = formattedName.substring(0, 9) + '...';
+        }
+        
+        return formattedName;
+    })();
 
+    
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
 
     const onLayoutRootView = useCallback(async () => {

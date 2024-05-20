@@ -2,56 +2,84 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ImageBackground, Image, TextInput, TouchableOpacity, Text, Alert, Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 
 export function Produtos({ navigation, route }) {
 
     const { produto } = route.params || {};
-    // Obtém o produto passado como parâmetro de navegação
-
     const [nomeProduto, setNomeProduto] = useState('');
     const [quantidade, setQuantidade] = useState('');
     const [preco, setPreco] = useState('');
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisivel, setModalVisivel] = useState(false);
+    const [errorModalVisivel, setErrorModalVisivel] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        setModalVisible(true);
-    }, []);
-
-    useEffect(() => {
-        // Verifica se há um produto passado como parâmetro
         if (produto) {
-            // Preenche os campos com as informações do produto
             setNomeProduto(produto.nome);
             setQuantidade(produto.quantidade.toString());
             setPreco(produto.preco.toString());
         }
-    }, [produto]); // Executa quando o produto muda
+    }, [produto]);
+
+    useEffect(() => {
+        const verificarPreferenciaModal = async () => {
+            try {
+                const valor = await AsyncStorage.getItem('esconderModal');
+                if (valor !== 'true') {
+                    setModalVisivel(true);
+                }
+            } catch (erro) {
+                console.error('Falha ao buscar os dados do armazenamento', erro);
+            }
+        };
+
+        verificarPreferenciaModal();
+    }, []);
+
+    const handleNaoMostrarNovamente = async () => {
+        try {
+            await AsyncStorage.setItem('esconderModal', 'true');
+            setModalVisivel(false);
+        } catch (erro) {
+            console.error('Falha ao salvar os dados no armazenamento', erro);
+        }
+    };
+
+    const mostrarErro = (mensagem) => {
+        setErrorMessage(mensagem);
+        setErrorModalVisivel(true);
+    };
+
+    const handlePrecoChange = (text) => {
+        // Substitui a vírgula por ponto
+        const formattedText = text.replace(',', '.');
+        setPreco(formattedText);
+    };
+
+
 
     const adicionarProduto = () => {
-        // Verifica se todos os campos estão preenchidos
         if (nomeProduto.trim() === '' || quantidade.trim() === '' || preco.trim() === '') {
-            alert('Por favor, preencha todos os campos.');
+            mostrarErro('Por favor, preencha todos os campos.');
             return;
         }
 
-        // Validar a quantidade e o preço
         const quant = parseInt(quantidade);
         const price = parseFloat(preco);
         if (isNaN(quant) || quant <= 0 || isNaN(price) || price <= 0) {
-            alert('Por favor, insira uma quantidade e preço válidos.');
+            mostrarErro('Por favor, insira uma quantidade e preço válidos.');
             return;
         }
 
-        // Cria o objeto do novo produto com as informações atualizadas
         const produtoAtualizado = {
-            id: produto ? produto.id : null, // Mantém o mesmo ID se estiver editando, caso contrário, é null (indicando um novo produto)
+            id: produto ? produto.id : null,
             nome: nomeProduto,
             quantidade: quant,
             preco: price,
         };
 
-        // Navega de volta para a tela Home com o produto atualizado
         navigation.navigate('Home', { produto: produtoAtualizado });
     };
 
@@ -67,18 +95,46 @@ export function Produtos({ navigation, route }) {
         return null;
     }
 
+
     return (
         <View style={styles.container} onLayout={onLayoutRootView}>
             <Modal
                 animationType="slide"
                 transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
+                visible={modalVisivel}
+                onRequestClose={() => setModalVisivel(false)}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Bem-vindo ao aplicativo!</Text>
-                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                        <Image
+                            style={styles.modalImage}
+                            source={require('../assets/bag.jpg')}
+                        />
+                        <Text style={styles.modalText}>
+                            Se o produto possui preço em quilo, a sacola equivale a uma unidade e o preço unitário é o preço da pesagem.
+                        </Text>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity onPress={() => setModalVisivel(false)} style={styles.closeButton}>
+                                <Text style={styles.closeButtonText}>OK</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleNaoMostrarNovamente} style={styles.dontShowAgainButton}>
+                                <Text style={styles.dontShowAgainButtonText}>Não mostrar novamente</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={errorModalVisivel}
+                onRequestClose={() => setErrorModalVisivel(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>{errorMessage}</Text>
+                        <TouchableOpacity onPress={() => setErrorModalVisivel(false)} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>Fechar</Text>
                         </TouchableOpacity>
                     </View>
@@ -127,11 +183,11 @@ export function Produtos({ navigation, route }) {
                     />
                     <TextInput
                         style={styles.inputLinha}
-                        placeholder="Insira o preço unitário"
+                        placeholder="Preço"
                         placeholderTextColor='rgba(00, 00, 00, 0.74)'
-                        keyboardType="numeric"
                         value={preco}
-                        onChangeText={setPreco}
+                        onChangeText={handlePrecoChange}
+                        keyboardType="numeric"
                     />
                 </View>
                 <TouchableOpacity style={styles.botao} onPress={adicionarProduto}>
@@ -144,7 +200,7 @@ export function Produtos({ navigation, route }) {
                     </Text>
 
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                <TouchableOpacity onPress={() =>  navigation.navigate('Main', { screen: 'Home' })}>
                     <Image
                         style={styles.setaEsquerda}
                         source={require('../assets/seta_esquerda.png')}
@@ -255,45 +311,61 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      title: {
+    },
+    title: {
         fontSize: 24,
         fontWeight: 'bold',
-      },
-      centeredView: {
+    },
+    centeredView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro
-      },
-      modalView: {
-        margin: 20,
+    },
+    modalView: {
+        margin: 35,
         backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 35,
+        borderRadius: 15,
+        padding: 33,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
-          width: 0,
-          height: 2,
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
-      },
-      modalText: {
+    },
+    modalText: {
         marginBottom: 15,
         textAlign: 'center',
-      },
-      closeButton: {
-        backgroundColor: '#2196F3',
+        fontFamily:'Inter',
+        fontSize:17    },
+    closeButton: {
+        backgroundColor: 'rgba(255, 93, 0, 1)',
+        width:250,
         borderRadius: 10,
         padding: 10,
         elevation: 2,
-      },
-      closeButtonText: {
+    },
+    closeButtonText: {
+        fontSize:18,
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
-      },
-    });
+    },
+    modalImage:{
+        width:150,
+        height:150
+    },
+    dontShowAgainButton:{
+        paddingTop:10,
+        alignItems:'center'
+    },
+    dontShowAgainButtonText:{
+        color:'rgba(0, 0, 0, 0.50)',
+        fontSize:15,
+        fontWeight:'700'
+    }
+});

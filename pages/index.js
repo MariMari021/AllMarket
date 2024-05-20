@@ -156,9 +156,6 @@ export function Home({ route, navigation }) {
         setValorLimite(value);
     };
 
-    const handleNavigateToCompras = () => {
-        navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
-    };
 
 
     useEffect(() => {
@@ -372,7 +369,6 @@ export function Home({ route, navigation }) {
 
 
 
-
     const editarProduto = async (produto) => {
         setNomeProduto(produto.nome);
         setQuantidade(produto.quantidade);
@@ -442,6 +438,10 @@ export function Home({ route, navigation }) {
     if (!fontsLoaded && !fontError) {
         return null;
     }
+
+    const handleNavigateToCompras = () => {
+        navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
+    };
 
 
     return (
@@ -844,8 +844,8 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     profile: {
-        width: 50,
-        height: 50
+        width: 45,
+        height: 45
     },
     sacola: {
         width: 30,
