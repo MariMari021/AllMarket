@@ -47,13 +47,13 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
             />
             <Text style={styles.tituloAdicionar}>{nomeFormatado}</Text>
             <View style={styles.valores}>
-                <TouchableOpacity style={styles.botaoMaisProduto} onPress={() => onPressAdicionar (id)}>
+                <TouchableOpacity style={styles.botaoMaisProduto}  onPress={adicionarUnidade}>
                     <Image style={styles.botaoMaisProduto}
                         source={require('../assets/botaoMais.png')}
                     />
                 </TouchableOpacity>
                 <Text style={styles.quantidade}>{quantidade}</Text>
-                <TouchableOpacity style={styles.botaoMenosProduto} onPress={() => onPressRemover(id)}>
+                <TouchableOpacity style={styles.botaoMenosProduto} onPress={removerUnidade}>
                     <Image style={styles.botaoMenosProduto}
                         source={require('../assets/botaoMenos.png')}
                     />
@@ -61,7 +61,7 @@ export function CardAdicionado({ id, nome, quantidade, preco, onPressRemover, on
             </View>
             <Text style={styles.valorProduto}>R$ {valorTotal.toFixed(2)}</Text>
             <View style={styles.apagarEditar}>
-                <TouchableOpacity style={styles.botaoEditar}    onPress={() => onPressRemoverCard(id)}>
+                <TouchableOpacity style={styles.botaoEditar}    onPress={() => onPressRemover(id)}>
                     <Image
                         style={styles.remover}
                         source={require('../assets/apagarCard.png')}

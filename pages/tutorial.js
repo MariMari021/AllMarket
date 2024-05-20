@@ -1,74 +1,166 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import Swiper from 'react-native-swiper';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 
-const images = [
-  'https://images.unsplash.com/photo-1566895291281-ea63efd4bdbc?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fDklMkYxNnxlbnwwfHwwfHx8MA%3D%3D',
-  'https://images.unsplash.com/photo-1604311795833-25e1d5c128c6?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8OSUyRjE2fGVufDB8fDB8fHww',
-  'https://images.unsplash.com/photo-1499314060091-745e1ca06f22?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDZ8fHxlbnwwfHx8fHw%3D&w=1000&q=80',
+// Array de objetos com imagens
+const slides = [
+  { source: require('../assets/foto2.png') },
+  { source: require('../assets/foto3.png') },
+  { source: require('../assets/foto4.png') },
+  { source: require('../assets/foto1.png') },
+
 ];
 
-export function Tutorial() {
+export function Tutorial({navigation}) {
   const [index, setIndex] = useState(0);
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); // Change image every 3 seconds
+    startInterval();
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalRef.current);
   }, []);
 
+  const startInterval = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % slides.length);
+    }, 7000); // Muda a imagem a cada 7 segundos
+  };
+
+  const handlePress = (idx) => {
+    setIndex(idx);
+    startInterval();
+  };
+
+  const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
+
+  useEffect(() => {
+    async function loadData() {
+      SplashScreen.preventAutoHideAsync();
+    }
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    async function hideSplash() {
+      if (fontsLoaded || fontError) {
+        await SplashScreen.hideAsync();
+      }
+    }
+    hideSplash();
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Swiper
-        loop={true}
-        index={index}
-        onIndexChanged={(newIndex) => setIndex(newIndex)}
-        autoplay={false}
-        showsPagination={false}
-      >
-        {images.map((image, idx) => (
-          <View key={idx} style={styles.imageContainer}>
-            <Image source={{ uri: image }} style={styles.image} />
+    <ScrollView style={{ height: 50 }}>
+      <View style={styles.container}>
+        <View style={styles.conteudo}>
+          <View style={styles.header}>
+            <Image
+              style={styles.maisProduto}
+              source={require('../assets/logo.png')}
+            />
           </View>
-        ))}
-      </Swiper>
-      <View style={styles.pagination}>
-        {images.map((_, idx) => (
-          <TouchableOpacity
-            key={idx}
-            style={[styles.dot, index === idx && styles.activeDot]}
-            onPress={() => setIndex(idx)}
-          />
-        ))}
+          <Text style={styles.dicas}>Dicas de uso</Text>
+          <Swiper
+            loop={true}
+            index={index}
+            onIndexChanged={(newIndex) => {
+              setIndex(newIndex);
+              startInterval();
+            }}
+            autoplay={false}
+            showsPagination={false}
+          >
+            {slides.map((slide, idx) => (
+              <View key={idx} style={styles.slide}>
+                <Image source={slide.source} style={styles.media} />
+                <View style={styles.pagination}>
+                  {slides.map((_, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      style={[styles.dot, index === idx && styles.activeDot]}
+                      onPress={() => handlePress(idx)}
+                    />
+                  ))}
+                </View>
+              </View>
+            ))}
+          </Swiper>
+        </View>
+        <View style={styles.botao}>
+          <TouchableOpacity style={styles.fim}onPress={() => navigation.navigate('Home')}>
+            <Text style={styles.fimTexto}>Criar listas!</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    backgroundColor: "#0B8C38",
+  },
+  botao: {
+    backgroundColor: "#0B8C38",
+    height: '70%',
+    width: "100%",
+    padding: 40,
+    paddingEnd: 50,
+    paddingStart: 50,
+  },
+  conteudo: {
+    backgroundColor: "#fff",
+    width: '100%',
+    height: 710,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  header: {
+    paddingTop: "12%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '75%',
+    paddingStart: '12%',
+  },
+  dicas: {
+    paddingTop: '8%',
+    paddingBottom: '8%',
+    paddingStart: '13%',
+    fontFamily: 'Inter',
+    fontWeight: '800',
+    fontSize: 23,
+    color: '#5F5F5F'
+  },
+  maisProduto: {
+    width: 155,
+    height: 35,
+  },
+  pular: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  imageContainer: {
-    justifyContent: 'center',
+  slide: {
     alignItems: 'center',
     width: '100%',
-    height: 600,
   },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+  media: {
+    borderRadius: 15,
+    width: '75%',
+    height: '86%',
   },
   pagination: {
     flexDirection: 'row',
-    position: 'absolute',
-    bottom: 10,
-    alignSelf: 'center',
+    marginTop: 10,
+    marginBottom: 10,
   },
   dot: {
     width: 10,
@@ -78,7 +170,21 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   activeDot: {
-    backgroundColor: '#000',
+    backgroundColor: '#F26E22',
+  },
+  fim: {
+    alignItems: 'center',
+    width: '100%',
+    height: 52,
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+  },
+  fimTexto: {
+    fontFamily: 'Inter',
+    fontWeight: '700',
+    color: '#F26E22',
+    fontSize: 19,
   },
 });
 

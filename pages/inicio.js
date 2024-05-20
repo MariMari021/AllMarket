@@ -12,22 +12,22 @@ export function Inicio({ navigation }) {
 
     return (
         <ScrollView style={{ height: 50 }}>
-        <View style={styles.container}>
-            <View style={styles.parteBranca}>
-                <View style={styles.header}>
-                    <Image source={require('../assets/logo.png')} style={styles.logo} />
-                    <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-                        <Text style={styles.backText}>Voltar</Text>
-                        <Image source={require('../assets/setaDireita.png')} style={styles.backIcon} />
-                    </TouchableOpacity>
+            <View style={styles.container}>
+                <View style={styles.parteBranca}>
+                    <View style={styles.header}>
+                        <Image source={require('../assets/logo.png')} style={styles.logo} />
+                        <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
+                            <Text style={styles.backText}>Voltar</Text>
+                            <Image source={require('../assets/setaDireita.png')} style={styles.backIcon} />
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={styles.text}>Sua <Text style={styles.orangeText}>experiência</Text> de {'\n'}compras em <Text style={styles.greenText}>um toque!</Text></Text>
+                    <Image source={require('../assets/inicio.gif')} style={styles.imgPrincipal} />
                 </View>
-                <Text style={styles.text}>Sua <Text style={styles.orangeText}>experiência</Text> de {'\n'}compras em <Text style={styles.greenText}>um toque!</Text></Text>
-                <Image source={require('../assets/inicio.gif')} style={styles.imgPrincipal} />
+                <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+                    <Text style={styles.buttonText}>Fazer Login</Text>
+                </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-                <Text style={styles.buttonText}>Fazer Login</Text>
-            </TouchableOpacity>
-        </View>
         </ScrollView>
     );
 };

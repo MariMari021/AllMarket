@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, Image, TouchableOpacity, TextInput, Modal } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CardAdicionado } from './cardAdicionado'; // Importe o componente CardAdicionado, se necessário
 import { useFonts } from 'expo-font';
 import { useFocusEffect } from '@react-navigation/native';
@@ -31,7 +32,7 @@ export function Home({ route, navigation }) {
     const [categoriaParaSalvar, setCategoriaParaSalvar] = useState('');
     const [nomeDaLista, setNomeDaLista] = useState('');
     const [listasSalvas, setListasSalvas] = useState([]);
-    
+
 
     useFocusEffect(
         React.useCallback(() => {
@@ -41,31 +42,97 @@ export function Home({ route, navigation }) {
         }, [route.params?.listasSalvas])
     );
 
-    const salvarLista = () => {
+    useEffect(() => {
+        if (!modalSalvarVisible) {
+            setNomeDaLista('');
+            setCategoriaParaSalvar('');
+        }
+    }, [modalSalvarVisible]);
+
+    const salvarLista = async () => {
         const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === categoriaParaSalvar);
-        if (produtosNaCategoria.length > 0) {
-            const novaLista = {
-                nome: nomeDaLista,
-                categoria: categoriaParaSalvar,
-                produtos: produtosNaCategoria,
-                data: new Date().toISOString() // Convertendo data para string
-            };
-            setListasSalvas([...listasSalvas, novaLista]);
+
+        if (produtosNaCategoria.length === 0) {
+            // Exibe o modal informando que não há produtos na categoria selecionada
+            setModalNenhumProdutoVisible(true);
+            setModalSalvarVisible(false);
+            return;
+        }
+
+        const novaLista = {
+            nome: nomeDaLista,
+            categoria: categoriaParaSalvar,
+            produtos: produtosNaCategoria,
+            data: new Date().toISOString() // Convertendo data para string
+        };
+
+        // Verifica se já existe uma lista com a mesma categoria e produtos
+        const listaExistente = listasSalvas.some(lista =>
+            lista.categoria === categoriaParaSalvar &&
+            lista.produtos.length === produtosNaCategoria.length &&
+            lista.produtos.every((produto, index) => produto.id === produtosNaCategoria[index].id)
+        );
+
+        if (listaExistente) {
+            // Exibe o modal informando que a categoria já foi salva com os mesmos produtos
+            setModalCategoriaJaSalvaVisible(true);
+        } else {
+            // Adiciona a nova lista e salva
+            const novasListasSalvas = [...listasSalvas, novaLista];
+            setListasSalvas(novasListasSalvas);
+            await saveListas(novasListasSalvas);
             setModalListaSalva(true);
         }
+
         setModalSalvarVisible(false);
     };
 
-    const navegarLista = () => {
-        const atualizarListas = (novasListas) => {
-            setListasSalvas(novasListas);
+
+
+    const saveListas = async (listas) => {
+        try {
+            const jsonValue = JSON.stringify(listas);
+            await AsyncStorage.setItem('@listasSalvas', jsonValue);
+        } catch (e) {
+            console.error('Failed to save the lists to storage', e);
+        }
+    };
+
+    const loadListas = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@listasSalvas');
+            return jsonValue != null ? JSON.parse(jsonValue) : [];
+        } catch (e) {
+            console.error('Failed to load the lists from storage', e);
+        }
+    };
+
+    useEffect(() => {
+        const fetchListas = async () => {
+            const listas = await loadListas();
+            setListasSalvas(listas);
         };
-    
+        fetchListas();
+    }, []);
+
+    useEffect(() => {
+        saveListas(listasSalvas);
+    }, [listasSalvas]);
+
+
+
+    const navegarLista = () => {
+        const atualizarListas = async (novasListas) => {
+            setListasSalvas(novasListas);
+            await saveListas(novasListas);
+        };
+
         navigation.navigate('ListaSalva', { listasSalvas, atualizarListas });
     };
-    
-    
-    
+
+
+
+
 
 
 
@@ -234,19 +301,24 @@ export function Home({ route, navigation }) {
     }, [modalVisible]);
 
 
-    const adicionarProduto = (produto) => {
+    const adicionarProduto = async (produto) => {
         const produtoComCategoria = { ...produto, categoria: selectedCategory };
         const index = produtosAdicionados.findIndex(p => p.id === produto.id);
+        let novosProdutosAdicionados;
+
         if (index !== -1) {
-            const novosProdutosAdicionados = [...produtosAdicionados];
+            novosProdutosAdicionados = [...produtosAdicionados];
             novosProdutosAdicionados[index] = produtoComCategoria;
-            setProdutosAdicionados(novosProdutosAdicionados);
         } else {
             produtoComCategoria.id = nextId;
-            setProdutosAdicionados([produtoComCategoria, ...produtosAdicionados]);
+            novosProdutosAdicionados = [produtoComCategoria, ...produtosAdicionados];
             setNextId(nextId + 1);
         }
+
+        setProdutosAdicionados(novosProdutosAdicionados);
+        await saveProdutos(novosProdutosAdicionados);
     };
+
 
     useEffect(() => {
         const categorias = produtosAdicionados.reduce((acc, produto) => {
@@ -267,23 +339,67 @@ export function Home({ route, navigation }) {
 
 
 
-    const removerProduto = (idParaRemover) => {
-        // Encontra o índice do produto a ser removido
+    const removerProduto = async (idParaRemover) => {
         const indexToRemove = produtosAdicionados.findIndex(produto => produto.id === idParaRemover);
 
-        // Se o índice for encontrado, remove o produto da lista utilizando splice
         if (indexToRemove !== -1) {
             const newProdutosAdicionados = [...produtosAdicionados];
-            newProdutosAdicionados.splice(indexToRemove, 1); // Remove 1 elemento a partir do índice indexToRemove
+            newProdutosAdicionados.splice(indexToRemove, 1);
             setProdutosAdicionados(newProdutosAdicionados);
+            await saveProdutos(newProdutosAdicionados);
         }
     };
 
-    const editarProduto = (produto) => {
+
+
+    const saveProdutos = async (produtos) => {
+        try {
+            const jsonValue = JSON.stringify(produtos);
+            await AsyncStorage.setItem('@produtosAdicionados', jsonValue);
+        } catch (e) {
+            console.error('Failed to save the data to the storage', e);
+        }
+    };
+
+    const loadProdutos = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('@produtosAdicionados');
+            return jsonValue != null ? JSON.parse(jsonValue) : [];
+        } catch (e) {
+            console.error('Failed to load the data from the storage', e);
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const produtos = await loadProdutos();
+            setProdutosAdicionados(produtos);
+        };
+        fetchData();
+    }, []);
+
+
+
+
+    const editarProduto = async (produto) => {
         setNomeProduto(produto.nome);
         setQuantidade(produto.quantidade);
         setPreco(produto.preco);
+
+        const index = produtosAdicionados.findIndex(p => p.id === produto.id);
+        if (index !== -1) {
+            const novosProdutosAdicionados = [...produtosAdicionados];
+            novosProdutosAdicionados[index] = produto;
+            setProdutosAdicionados(novosProdutosAdicionados);
+            await saveProdutos(novosProdutosAdicionados);
+        }
     };
+
+
+    useEffect(() => {
+        saveProdutos(produtosAdicionados);
+    }, [produtosAdicionados]);
+
 
     useEffect(() => {
         if (route.params && route.params.novoProduto) {
@@ -513,7 +629,7 @@ export function Home({ route, navigation }) {
                                     navigation.navigate('ListaSalva', { listasSalvas: listasSalvas });
                                 }}
                             >
-                                <Text style={styles.modalButtonText}>Acessar Lista Salva</Text>
+                                <Text style={styles.modalButtonText}>Acessar Lista!</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -525,39 +641,47 @@ export function Home({ route, navigation }) {
                     visible={modalSalvarVisible}
                     onRequestClose={() => setModalSalvarVisible(false)}
                 >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
+                    <View style={styles.modalContainerSalvar}>
+                        <View style={styles.modalContentSalvar}>
                             <TextInput
-                                style={styles.input}
+                                style={styles.nomeInputSalvar}
                                 placeholder="Digite o nome da lista"
                                 value={nomeDaLista}
                                 onChangeText={setNomeDaLista}
                             />
-                            <Text style={styles.modalTitle}>Escolha a categoria para salvar a lista:</Text>
-                            {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                            <Text style={styles.tituloModalSalvar}>Escolha a categoria para salvar a lista:</Text>
+                            <ScrollView style={styles.categoriaScrollViewSalvar}
+                                showsHorizontalScrollIndicator={true}
+                                persistentScrollbar={true}>
+                                {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                    <TouchableOpacity
+                                        key={categoria}
+                                        style={[
+                                            styles.categoriaBotaoSalvar,
+                                            categoriaParaSalvar === categoria && { backgroundColor: '#7DBF4E' }
+                                        ]}
+                                        onPress={() => setCategoriaParaSalvar(categoria)}
+                                    >
+                                        <Text style={[
+                                            styles.categoriaTextoSalvar,
+                                            categoriaParaSalvar === categoria && { color: 'white' }]}>{categoria}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                            <View style={styles.botoesContainerSalvar}>
                                 <TouchableOpacity
-                                    key={categoria}
-                                    style={[
-                                        styles.categoriaButton,
-                                        categoriaParaSalvar === categoria && { backgroundColor: '#7DBF4E' }
-                                    ]}
-                                    onPress={() => setCategoriaParaSalvar(categoria)}
+                                    style={[styles.botaoSalvar, { marginRight: 5 }]}
+                                    onPress={salvarLista}
                                 >
-                                    <Text style={styles.categoriaButtonText}>{categoria}</Text>
+                                    <Text style={styles.textoBotaoSalvar}>Salvar</Text>
                                 </TouchableOpacity>
-                            ))}
-                            <TouchableOpacity
-                                style={styles.modalButton}
-                                onPress={salvarLista}
-                            >
-                                <Text style={styles.modalButtonText}>Salvar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelButton]}
-                                onPress={() => setModalSalvarVisible(false)}
-                            >
-                                <Text style={styles.modalButtonText}>Cancelar</Text>
-                            </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.botaoSalvar, styles.cancelarBotaoSalvar]}
+                                    onPress={() => setModalSalvarVisible(false)}
+                                >
+                                    <Text style={styles.textoBotaoSalvar}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
                 </Modal>
@@ -606,39 +730,55 @@ export function Home({ route, navigation }) {
                     visible={modalVisible}
                     onRequestClose={() => setModalVisible(false)}
                 >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>Selecione as categorias a serem limpas:</Text>
-                            {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
-                                <TouchableOpacity
-                                    key={categoria}
-                                    style={[
-                                        styles.categoriaButton,
-                                        categoriasSelecionadas.includes(categoria) && { backgroundColor: '#7DBF4E' }
-                                    ]}
-                                    onPress={() => toggleCategoriaSelecionada(categoria)}
-                                >
-                                    <Text style={styles.categoriaButtonText}>{categoria}</Text>
-                                </TouchableOpacity>
-                            ))}
-                            <TouchableOpacity
-                                style={styles.modalButton}
-                                onPress={() => {
-                                    limparCategoriasSelecionadas();
-                                    setModalVisible(false);
-                                }}
+                    <View style={styles.modalContainerLimpar}>
+                        <View style={styles.modalContentLimpar}>
+                            <Text style={styles.modalTitleLimpar}>Selecione as categorias a serem limpas:</Text>
+                            <ScrollView
+                                style={styles.categoriaScrollViewLimpar}
+                                showsHorizontalScrollIndicator={true}
+                                persistentScrollbar={true}
                             >
+                                {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                    <TouchableOpacity
+                                        key={categoria}
+                                        style={[
+                                            styles.categoriaButtonLimpar,
+                                            categoriasSelecionadas.includes(categoria) && { backgroundColor: '#7DBF4E' }
+                                        ]}
+                                        onPress={() => toggleCategoriaSelecionada(categoria)}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.categoriaButtonTextLimpar,
+                                                categoriasSelecionadas.includes(categoria) && { color: '#fff' }
+                                            ]}
+                                        >
+                                            {categoria}
+                                        </Text>
 
-                                <Text style={styles.modalButtonText}>Limpar Categorias</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelButton]}
-                                onPress={() => setModalVisible(false)}
-                            >
-                                <Text style={styles.modalButtonText}>Cancelar</Text>
-                            </TouchableOpacity>
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                            <View style={styles.botoesContainerSalvar}>
+                                <TouchableOpacity
+                                    style={styles.modalButtonLimpar}
+                                    onPress={() => {
+                                        limparCategoriasSelecionadas();
+                                        setModalVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.modalButtonTextLimpar}>Limpar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.modalButtonLimpar, styles.cancelButtonLimpar]}
+                                    onPress={() => setModalVisible(false)}
+                                >
+                                    <Text style={styles.modalButtonTextLimpar}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
+
                 </Modal>
 
                 <Modal
@@ -1090,6 +1230,132 @@ const styles = StyleSheet.create({
         fontWeight: "800",
         color: "white",
     },
+    modalContainerSalvar: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContentSalvar: {
+        width: 300,
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    nomeInputSalvar: {
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        width: '100%',
+        marginBottom: 15,
+    },
+    tituloModalSalvar: {
+        fontSize: 19,
+        marginBottom: 10,
+        fontFamily: 'Inter',
+        fontWeight: '800',
+        color: "#0B8C38"
+    },
+    categoriaScrollViewSalvar: {
+        maxHeight: 150,
+        width: '100%',
+        marginBottom: 20,
+    },
+    categoriaBotaoSalvar: {
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 15,
+        marginBottom: 5,
+        width: '100%',
+        alignItems: 'center',
+    },
+    categoriaTextoSalvar: {
+        fontSize: 17,
+        fontFamily: 'Inter',
+        fontWeight: '700',
+        color: "rgba(0, 0, 0, 0.72)"
+    },
+    botoesContainerSalvar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    botaoSalvar: {
+        backgroundColor: '#7DBF4E',
+        padding: 10,
+        borderRadius: 20,
+        flex: 1,
+        alignItems: 'center',
+    },
+    cancelarBotaoSalvar: {
+        backgroundColor: 'rgba(255, 93, 0, 0.80)',
+    },
+    textoBotaoSalvar: {
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'Inter',
+        fontWeight: '600'
+    },
+    modalContainerLimpar: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContentLimpar: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+    },
+    modalTitleLimpar: {
+        color:"#0B8C38",
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    categoriaButtonLimpar: {
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 15,
+        marginBottom: 5,
+        width: '100%',
+        alignItems: 'center',
+    },
+    categoriaButtonTextLimpar: {
+        fontSize: 17,
+        fontFamily: 'Inter',
+        fontWeight: '700',
+        color: "rgba(0, 0, 0, 0.72)"
+    },
+    modalButtonLimpar: {
+        backgroundColor: '#7DBF4E',
+        padding: 10,
+        borderRadius: 18,
+        flex: 1,
+        alignItems: 'center',
+
+    },
+    modalButtonTextLimpar: {
+        color: '#fff',
+        fontSize: 15
+    },
+    cancelButtonLimpar: {
+        backgroundColor: 'rgba(255, 93, 0, 0.80)',
+        marginLeft: '3%'
+    },
+    categoriaScrollViewLimpar: {
+        maxHeight: 150,
+        width: '100%',
+        marginBottom: 20,
+    },
     modalContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -1097,45 +1363,28 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        width: '80%',
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
+        width: '80%',
         alignItems: 'center',
     },
     modalTitle: {
         fontSize: 18,
+        fontWeight: 'bold',
         marginBottom: 20,
+        textAlign: 'center',
+        color: 'color: "rgba(0, 0, 0, 0.72)'
     },
     modalButton: {
         backgroundColor: '#7DBF4E',
-        padding: 10,
-        borderRadius: 5,
-        marginTop: 10,
-        width: '100%',
+        padding: 15,
+        borderRadius: 17,
         alignItems: 'center',
+        width: '100%',
     },
     modalButtonText: {
         color: 'white',
-        fontSize: 16,
+        fontWeight: 'bold',
     },
-    cancelButton: {
-        backgroundColor: '#B0B0B0',
-    },
-    categoriaButton: {
-        backgroundColor: '#E0E0E0',
-        padding: 10,
-        borderRadius: 5,
-        marginTop: 10,
-        width: '100%',
-        alignItems: 'center',
-    },
-    categoriaButtonText: {
-        fontSize: 16,
-    },
-    modalInput: {
-        backgroundColor: "#000",
-        color: "#Fff",
-        width: 230
-    }
 });
