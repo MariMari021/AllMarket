@@ -1,44 +1,31 @@
 import React, { useState } from 'react';
-import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuidv4 from './uuidConfig';
+import { useUser } from './UserContext';
 
-export function Cadastro() {
+export function Cadastro( {navigation} ) {
   const [username, setUsername] = useState('');
   const [birthday, setBirthday] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const navigation = useNavigation();
+  const { setUserId, setIsAnonymous } = useUser();
 
-  const handleUsernameChange = (text) => {
-    setUsername(text);
-  };
-
-  const handleBirthdayChange = (text) => {
-    text = text.replace(/[^\d/]/g, '');
-    setBirthday(text);
-  };
-
-  const handlePhoneChange = (text) => {
-    text = text.replace(/[^\d]/g, '');
-    setPhone(text);
-  };
-
+  const handleUsernameChange = (text) => setUsername(text);
+  const handleBirthdayChange = (text) => setBirthday(text.replace(/[^\d/]/g, ''));
+  const handlePhoneChange = (text) => setPhone(text.replace(/[^\d]/g, ''));
   const handleEmailChange = (text) => {
     setEmail(text);
-  
     if (!text.includes('@')) {
       setErrorMessage('Por favor, insira um email válido.');
     } else {
       setErrorMessage('');
     }
   };
-
   const handlePasswordChange = (text) => {
     setPassword(text);
-
     if (text.length !== 8 || !/[!@#$%]/.test(text)) {
       setErrorMessage('A senha deve ter 8 caracteres e conter pelo menos um símbolo (!@#$%).');
     } else {
@@ -51,16 +38,20 @@ export function Cadastro() {
       setErrorMessage('Por favor, preencha todos os campos corretamente.');
       return;
     }
-  
+
     try {
-      // Salvando os dados do cadastro no AsyncStorage
-      await AsyncStorage.setItem('userData', JSON.stringify({ username, email, password }));
+      const userId = uuidv4(); // Use a função uuidv4 importada para gerar um UUID para o ID do usuário
+      const userData = { userId, username, birthday, phone, email, password };
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      setUserId(userId);
+      setIsAnonymous(false); // Usuário não é mais anônimo
       navigation.navigate('Home');
       setErrorMessage('');
     } catch (error) {
       console.error('Erro ao salvar os dados do cadastro:', error);
     }
   };
+
 
   const handleBackPress = () => {
     navigation.navigate('Inicio');
@@ -131,6 +122,8 @@ export function Cadastro() {
     </ScrollView>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   scrollContainer: {
