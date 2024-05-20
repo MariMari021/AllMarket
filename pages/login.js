@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -12,12 +12,10 @@ export function Login() {
 
   const handleLogin = async () => {
     try {
-      // Recuperando os dados salvos do AsyncStorage
       const userData = await AsyncStorage.getItem('userData');
       if (userData) {
         const { email: storedEmail, password: storedPassword } = JSON.parse(userData);
         if (storedEmail === email && storedPassword === password) {
-          // Login bem-sucedido, navegar para a página Home
           navigation.navigate('Home');
         } else {
           setErrorMessage('Email ou senha inválidos.');
@@ -29,21 +27,25 @@ export function Login() {
       console.error('Erro ao recuperar os dados do cadastro:', error);
     }
   };
-  
 
   const navigateToCadastro = () => {
     navigation.navigate('Cadastro');
   };
 
   return (
-    
     <View style={styles.container}>
       <ImageBackground
         source={require('../assets/login.png')}
         style={styles.backgroundImage}
+        resizeMode="cover"
       >
+        <View style={styles.overlay} />
         <View style={styles.containerForm}>
-          <Text style={styles.welcomeText}>Bem vindo (a) de volta!</Text>
+          <Text style={styles.welcomeText}>Seja bem-vindo (a) ao</Text>
+          <View style={styles.textWithImage}>
+            
+            <Image source={require('../assets/logo.png')} style={styles.icon} />
+          </View>
           <TextInput
             style={styles.input}
             placeholder="Nome de Usuário"
@@ -70,7 +72,7 @@ export function Login() {
             style={styles.loginButton}
             onPress={handleLogin}
           >
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>Acessar</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={navigateToCadastro}>
             <Text style={styles.signUpText}>
@@ -80,66 +82,84 @@ export function Login() {
         </View>
       </ImageBackground>
     </View>
-    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFF',
   },
   backgroundImage: {
+    flex: 1,
     width: '100%',
-    height: '60%',
-    resizeMode: 'cover',
+    height: '40%',
+    justifyContent: 'flex-end',
   },
+ 
   containerForm: {
     backgroundColor: '#FFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingStart: '5%',
-    paddingEnd: '5%',
-    paddingTop: '10%',
-    paddingBottom: '5%',
-    width: '100%',
-    position: 'absolute',
-    bottom: -270,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    height: '130%',
+    marginBottom: 160,
+    paddingEnd: 40,
+    paddingStart: 40
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#5f5f5f',
+    marginBottom: 10,
+  },
+  textWithImage: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
-    textAlign: 'center',
-    color: '#5F5F5F'
+  },
+  subText: {
+    fontSize: 24,
+    color: '#333',
+    fontWeight: 'bold'
+  },
+  icon: {
+    width: 156,
+    height: 30,
+    marginLeft: 10,
   },
   input: {
-    height: 40,
-    borderColor: '#F7AB38',
+    width: '100%',
+    height: 50,
+    borderColor: '#F26E22',
     borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 15.5,
-    width: 300,
-    marginBottom: 20,
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    fontSize: 16,
+    top: 15
   },
   loginButton: {
-    backgroundColor: '#165515',
+    width: '100%',
+    height: 45,
+    backgroundColor: '#0B8C38',
+    borderRadius: 15,
     alignItems: 'center',
-    padding: 10,
-    borderRadius: 8,
-    width: 300
+    justifyContent: 'center',
+    marginVertical: 10,
+    top: 15
   },
   buttonText: {
     color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold'
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   signUpText: {
-    color: '#5F5F5F',
     fontSize: 16,
+    color: '#666',
     marginTop: 20,
-    textAlign: 'center'
+    top: 15
   },
   signUpLink: {
     color: '#0B57D0',
@@ -150,3 +170,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+export default Login;

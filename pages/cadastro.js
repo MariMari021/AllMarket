@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 
 export function Cadastro() {
   const [username, setUsername] = useState('');
@@ -56,132 +55,168 @@ export function Cadastro() {
     try {
       // Salvando os dados do cadastro no AsyncStorage
       await AsyncStorage.setItem('userData', JSON.stringify({ username, email, password }));
-      navigation.navigate('Sucesso');
+      navigation.navigate('Home');
       setErrorMessage('');
     } catch (error) {
       console.error('Erro ao salvar os dados do cadastro:', error);
     }
   };
-  
+
+  const handleBackPress = () => {
+    navigation.navigate('Inicio');
+  };
 
   return (
-    <ScrollView style={{ height: 50 }}>
-    <View style={styles.container}>
-      <ImageBackground
-        source={require('../assets/cadastro.png')}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.containerForm}>
-          <Text style={styles.welcomeText}>Cadastre-se em nosso App!</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome de Usuário"
-            value={username}
-            onChangeText={handleUsernameChange}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="(dd/mm/aaaa)"
-            value={birthday}
-            onChangeText={handleBirthdayChange}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Telefone"
-            value={phone}
-            onChangeText={handlePhoneChange}
-            keyboardType="numeric"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={handleEmailChange}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            secureTextEntry={true}
-            value={password}
-            onChangeText={handlePasswordChange}
-          />
-          {errorMessage ? (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorMessage}>{errorMessage}</Text>
-            </View>
-          ) : null}
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={handleCadastro}
-          >
-            <Text style={styles.buttonText}>Cadastrar</Text>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require('../assets/cadastro.png')}
+          style={styles.backgroundImage}
+        >
+          <View style={styles.formContainer}>
+            <Text style={styles.welcomeText}>Cadastre-se agora!</Text>
+            <Image source={require('../assets/logo.png')} style={styles.image} />
+            <TextInput
+              style={styles.input}
+              placeholder="Nome de Usuário"
+              value={username}
+              onChangeText={handleUsernameChange}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="(dd/mm/aaaa)"
+              value={birthday}
+              onChangeText={handleBirthdayChange}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Telefone"
+              value={phone}
+              onChangeText={handlePhoneChange}
+              keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={handleEmailChange}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              secureTextEntry={true}
+              value={password}
+              onChangeText={handlePasswordChange}
+            />
+            {errorMessage ? (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorMessage}>{errorMessage}</Text>
+              </View>
+            ) : null}
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={handleCadastro}
+            >
+              <Text style={styles.buttonText}>Cadastrar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBackPress}
+            >
+              <Image source={require('../assets/seta_esquerda.png')} style={styles.backButtonText} />
+            </TouchableOpacity>
+          </View>
+        </ImageBackground>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   backgroundImage: {
+    flex: 1,
     width: '100%',
-    height: '70%',
+    height: '35%',
     resizeMode: 'cover',
+    justifyContent: 'center',
   },
-  containerForm: {
-    backgroundColor: '#FFF',
+  formContainer: {
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingStart: '5%',
-    paddingEnd: '5%',
-    paddingTop: '10%',
-    paddingBottom: '5%',
-    width: '100%',
-    position: 'relative',
-    bottom: -200,
+    padding: 20,
+    paddingTop: 40,
+    marginBottom: -180,
+    paddingEnd: 40,
+    paddingStart: 40,
     alignItems: 'center',
-    height: '120%'
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
     color: '#5F5F5F'
   },
-  input: {
-    height: 60, //40
-    borderColor: '#F7AB38',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 15.5,
-    width: 300,
+  image: {
+    width: 156,
+    height: 30,
     marginBottom: 20,
   },
-  loginButton: {
-    backgroundColor: '#165515',
+  input: {
+    height: 50,
+    borderColor: '#F26E22',
+    borderWidth: 1,
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    width: '100%',
+    marginBottom: 20,
+  },
+  registerButton: {
+    backgroundColor: '#0B8C38',
     alignItems: 'center',
-    padding: 10,
-    borderRadius: 8,
-    width: 300,
-    marginBottom: 30
+    paddingVertical: 15,
+    borderRadius: 15,
+    width: '100%',
+    marginTop: 10,
+    height: 50
   },
   buttonText: {
     color: '#FFF',
     fontSize: 16,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+  },
+  backButton: {
+    alignItems: 'center',
+    marginTop: 10,
+    paddingVertical: 15,
+    borderRadius: 15,
+    width: '100%',
+    alignSelf: 'flex-start',
+    height: 50
+  },
+  backButtonText: {
+    width: 45,
+    height:40,
+    alignSelf: 'flex-start',
+    top: 10
   },
   errorContainer: {
-    width: 300,
-    alignItems: 'center', // Centralizando horizontalmente
+    width: '100%',
+    alignItems: 'center',
   },
   errorMessage: {
     color: 'red',
     marginBottom: 10,
-    textAlign: 'center', // Centralizando horizontalmente
+    textAlign: 'center',
   },
 });
+

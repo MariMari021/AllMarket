@@ -11,13 +11,13 @@ export function Inicio({ navigation }) {
     };
 
     return (
-        <ScrollView style={{ height: 50 }}>
+        <ScrollView style={{ flex: 1 }}>
         <View style={styles.container}>
             <View style={styles.parteBranca}>
                 <View style={styles.header}>
                     <Image source={require('../assets/logo.png')} style={styles.logo} />
                     <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
-                        <Text style={styles.backText}>Voltar</Text>
+                        <Text style={styles.backText}>Pular</Text>
                         <Image source={require('../assets/setaDireita.png')} style={styles.backIcon} />
                     </TouchableOpacity>
                 </View>
@@ -41,11 +41,11 @@ const styles = StyleSheet.create({
     parteBranca: {
         backgroundColor: 'white',
         width: '100%',
-        height: '84%',
+        height: '83%',
         paddingStart: '8%',
         paddingEnd: '8%',
         paddingTop: '12%',
-        paddingBottom: '12%',
+        paddingBottom: '42%',
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
     },
@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         alignItems: 'center',
-        marginTop: 40,
-        marginBottom: 45
+        marginTop: 80,
+        marginBottom: '37%'
     },
     orangeText: {
         color: '#F26E22',
@@ -92,16 +92,15 @@ const styles = StyleSheet.create({
     },
     imgPrincipal: {
         alignSelf: 'center',
-        width: 250,
-        height: 250,
-
+        width: 290,
+        height: 290,
     },
     button: {
         backgroundColor: 'white',
         borderRadius: 20,
         width: 310,
         height: 50,
-        top: 25
+        top: '5%'
     },
     buttonText: {
         color: '#F26E22',

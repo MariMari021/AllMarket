@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export function Compras({ route }) {
+  const navigation = useNavigation();
   const routeParams = route.params ?? {};
   const ultimoValorLimite = routeParams.ultimoValorLimite;
   const { categoriasComTotais = [] } = route.params || {};
@@ -48,6 +50,12 @@ export function Compras({ route }) {
               <Text style={styles.nenhumText}>Nenhum </Text>
               <Text style={styles.valorText}>valor ou {'\n'}categoria definidos.</Text>
             </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+              <Image 
+                style={styles.mais}
+                source={require('../assets/maisIcone.png')}
+              />
+            </TouchableOpacity>
           </View>
         ) : (
           <>
@@ -133,6 +141,11 @@ const styles = StyleSheet.create({
   centralizarConteudo: {
     alignItems: 'center',
   },
+  mais: {
+    width: 43,
+    height: 43,
+    marginTop: 20
+  },
   iconeTopo: {
     marginTop: 10,
     width: 42,
@@ -152,7 +165,6 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 35,
     borderBottomStartRadius: 35,
     backgroundColor: '#fff',
-    borderWidth: 1,
   },
   iconContainer: {
     flexDirection: 'row',
@@ -191,7 +203,7 @@ const styles = StyleSheet.create({
     width: 248,
     height: 43,
     paddingLeft: 20,
-    padding: 10, 
+    padding: 10,
     borderWidth: 0.70,
     borderColor: "#B8C8B7",
     borderRadius: 25,
@@ -214,10 +226,10 @@ const styles = StyleSheet.create({
   },
   categoriaLabel: {
     backgroundColor: '#7DBF4E',
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     padding: 5,
-    borderRadius: 15, 
-    marginRight: 5, 
+    borderRadius: 15,
+    marginRight: 5,
     width: 130,
     height: 32,
     fontWeight: 'bold',
@@ -227,40 +239,40 @@ const styles = StyleSheet.create({
   valorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', 
-    borderRadius: 15, 
-    paddingVertical: 5, 
-    paddingHorizontal: 10, 
-    marginRight: 5, 
-    backgroundColor: '#FFFFFF', 
-    borderWidth: 1, 
-    borderColor: '#7DBF4E', 
+    justifyContent: 'space-between',
+    borderRadius: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginRight: 5,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#7DBF4E',
     width: 316,
     top: 20,
     marginBottom: 40
   },
   valorIcone: {
-    width: 39, 
-    height: 39, 
+    width: 39,
+    height: 39,
   },
   valorText: {
-    color: '#165515', 
+    color: '#0B8C38',
     fontWeight: 'bold',
     fontSize: 22
   },
   caixa: {
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    backgroundColor: '#165515', 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#165515',
     padding: 10,
-    borderRadius: 5, 
+    borderRadius: 5,
     marginBottom: 10,
     width: 316,
     top: 20
   },
   caixaTexto: {
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 22
   },
@@ -270,29 +282,29 @@ const styles = StyleSheet.create({
     color: '#5F5F5F'
   },
   caixaIcone: {
-    width: 39, 
-    height: 39, 
-    marginRight: 10, 
+    width: 39,
+    height: 39,
+    marginRight: 10,
   },
   caixaValor: {
-    color: '#FFFFFF', 
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 20
   },
   spacing: {
-    marginBottom: 35, 
+    marginBottom: 35,
   },
   mensagemContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 200, 
+    marginTop: 200,
   },
   mensagem: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   nenhumText: {
-    color: 'orange', 
+    color: 'orange',
   },
 });

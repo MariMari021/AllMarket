@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export function Perfil() {
-
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigation = useNavigation();
+
   useEffect(() => {
     const getUserData = async () => {
       try {
         const storedUserData = await AsyncStorage.getItem('userData');
         if (storedUserData) {
           setUserData(JSON.parse(storedUserData));
+          setIsLoggedIn(true);
         }
       } catch (error) {
         console.error('Erro ao recuperar os dados do cadastro:', error);
@@ -24,12 +28,11 @@ export function Perfil() {
 
   const numProdutosAdicionados = produtosAdicionados.length;
 
-  const firstName = userData.username.split(' ')[0];
-
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userData');
       setUserData({ username: '', email: '', password: '' });
+      setIsLoggedIn(false);
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
@@ -37,64 +40,81 @@ export function Perfil() {
 
   return (
     <ScrollView style={{ height: 50 }}>
-    <View style={styles.container}>
-      <View style={styles.topBar}>
-        <View style={styles.iconContainer}>
-          <Image source={require('../assets/profile.png')} style={styles.iconeTopo} />
-          <Image source={require('../assets/sacola.png')} style={styles.iconeTopo} />
-        </View>
-        <View style={styles.header}>
-        <Text style={styles.greeting}>Olá, {userData.username ? userData.username.split(' ')[0] : 'usuário'} <Image source={require('../assets/ola.png')} style={styles.ola} /> </Text>
-
-
-          <Text style={styles.subtitle}>Consulte os seus dados.</Text>
-        </View>
-       
-      </View>
-     
-      <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text> adicionados</Text>
-          <View style={styles.cardContent}>
-            <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
-            <Text style={styles.cardNumber}>{numProdutosAdicionados}</Text>
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <View style={styles.iconContainer}>
+            <Image source={require('../assets/profile.png')} style={styles.iconeTopo} />
+            <Image source={require('../assets/sacola.png')} style={styles.iconeTopo} />
           </View>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Ver Mais</Text>
-            <Image source={require('../assets/setaLaranja.png')} style={styles.buttonIcon} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.card2}>
-          <Text style={styles.cardTitle2}><Text style={styles.greenText}>Categorias</Text> adicionados</Text>
-          <View style={styles.cardContent}>
-            <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
-            <Text style={styles.cardNumber2}>7</Text>
+          <View style={styles.header}>
+            <Text style={styles.greeting}>
+              Olá, 
+              <Text style={styles.username}>
+                {userData.username ? userData.username.split(' ')[0] : 'usuário'}
+              </Text>
+              <Image source={require('../assets/ola.png')} style={styles.ola} />
+            </Text>
+            <Text style={styles.subtitle}>Consulte os seus dados.</Text>
           </View>
-          <TouchableOpacity style={styles.button2}>
-            <Text style={styles.buttonText}>Ver Mais</Text>
-            <Image source={require('../assets/setaVerde.png')} style={styles.buttonIcon} />
-          </TouchableOpacity>
+        </View>
+        <View style={styles.tudo}>
+          {isLoggedIn ? (
+            <>
+              <View style={styles.cardContainer}>
+                <View style={styles.card}>
+                  <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text> adicionados</Text>
+                  <View style={styles.cardContent}>
+                    <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
+                    <Text style={styles.cardNumber}>{numProdutosAdicionados}</Text>
+                  </View>
+                  <TouchableOpacity style={styles.button}>
+                    <Text style={styles.buttonText}>Ver Mais</Text>
+                    <Image source={require('../assets/setaLaranja.png')} style={styles.buttonIcon} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.card2}>
+                  <Text style={styles.cardTitle2}><Text style={styles.greenText}>Categorias</Text> adicionados</Text>
+                  <View style={styles.cardContent}>
+                    <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
+                    <Text style={styles.cardNumber2}>7</Text>
+                  </View>
+                  <TouchableOpacity style={styles.button2}>
+                    <Text style={styles.buttonText}>Ver Mais</Text>
+                    <Image source={require('../assets/setaVerde.png')} style={styles.buttonIcon} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.sectionTitleContainer}>
+                <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
+              </View>
+              <View style={styles.inputContainer}>
+                <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
+              </View>
+              <View style={styles.inputContainer}>
+                <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Email" value={userData.email} />
+              </View>
+              <View style={styles.inputContainer}>
+                <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
+              </View>
+              <TouchableOpacity onPress={handleLogout}>
+                <Text style={styles.logoutButton}>Sair do login</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <View style={styles.loginPromptContainer}>
+              <Text style={styles.loginPromptText}>
+                Faça <Text style={styles.loginHighlight}>login</Text> para aparecer os dados sobre suas listas!
+              </Text>
+              <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
+                <Text style={styles.loginButtonText}>Fazer Login</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
-      <View style={styles.sectionTitleContainer}>
-        <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
-      </View>
-      <View style={styles.inputContainer}>
-        <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
-      </View>
-      <View style={styles.inputContainer}>
-        <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Email" value={userData.email} />
-      </View>
-      <View style={styles.inputContainer}>
-        <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
-        <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
-      </View>
-      <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.logoutButton}>Sair do login</Text>
-        </TouchableOpacity>
-    </View>
     </ScrollView>
   );
 }
@@ -104,8 +124,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9F9',
   },
+  tudo: {
+    padding: 16,
+  },
+  username: {
+    color: '#0B8C38', 
+  },
   iconeTopo: {
-    marginTop: 10,
+    marginTop: 40,
     width: 35,
     height: 35,
   },
@@ -118,7 +144,6 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 35,
     borderBottomStartRadius: 35,
     backgroundColor: '#fff',
-    borderWidth: 1,
   },
   iconContainer: {
     flexDirection: 'row',
@@ -134,7 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginLeft: 10,
-    color: '#5F5F5F'
+    color: '#5F5F5F',
   },
   userName: {
     color: '#007B3A',
@@ -142,7 +167,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginLeft: 10
+    marginLeft: 10,
   },
   cardContainer: {
     flexDirection: 'row',
@@ -211,8 +236,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: '#88B887',
     borderRadius: 20,
-    width: 130,
-    height: 36,
+    width: 150,
+    height: 40,
+    marginLeft: -6,
   },
   button2: {
     marginTop: 10,
@@ -222,8 +248,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: '#F4884A',
     borderRadius: 20,
-    width: 130,
-    height: 36,
+    width: 150,
+    height: 40,
+    marginLeft: -6,
   },
   buttonText: {
     color: '#fff',
@@ -232,8 +259,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonIcon: {
-    width: 26,
-    height: 24,
+    width: 32,
+    height: 30,
   },
   sectionTitleContainer: {
     flexDirection: 'row',
@@ -245,7 +272,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginRight: 5,
-    color: '#5F5F5F'
+    color: '#5F5F5F',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -256,10 +283,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: 16,
     paddingHorizontal: 8,
-    marginTop: 20
+    marginTop: 20,
   },
   input: {
-    height: 40,
+    height: 50,
     flex: 1,
     paddingLeft: 8,
   },
@@ -272,12 +299,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     textAlign: 'center',
     marginTop: 20,
-    color: '#F4884A', // Cor laranja
+    color: '#F4884A',
     fontSize: 16,
     fontWeight: 'bold',
-    paddingVertical: 8, // Ajuste a altura conforme necessário
-    paddingHorizontal: 12, // Ajuste a largura conforme necessário
-    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 13,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -289,9 +316,38 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 16,
   },
-  
-  
-  
+  loginPromptContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginTop: 200, // Ajuste para centralizar verticalmente conforme necessário
+  },
+  loginPromptText: {
+    fontSize: 20,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    paddingEnd: 40,
+    paddingStart: 40
+  },
+  loginHighlight: {
+    color: '#F26E22', // Cor laranja
+    fontWeight: 'bold',
+    fontSize: 20
+  },
+  loginButton: {
+    backgroundColor: '#0B8C38',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+    width: 200,
+    height: 40
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
 });
-
-
