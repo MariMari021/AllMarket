@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, ImageBackground, Image, TextInput, TouchableOpacity, Text, Alert } from 'react-native';
+import { StyleSheet, View, ImageBackground, Image, TextInput, TouchableOpacity, Text, Alert, Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 
 export function Produtos({ navigation, route }) {
-    
+
     const { produto } = route.params || {};
     // Obtém o produto passado como parâmetro de navegação
 
     const [nomeProduto, setNomeProduto] = useState('');
     const [quantidade, setQuantidade] = useState('');
     const [preco, setPreco] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        setModalVisible(true);
+    }, []);
 
     useEffect(() => {
         // Verifica se há um produto passado como parâmetro
@@ -64,6 +69,21 @@ export function Produtos({ navigation, route }) {
 
     return (
         <View style={styles.container} onLayout={onLayoutRootView}>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Bem-vindo ao aplicativo!</Text>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                            <Text style={styles.closeButtonText}>Fechar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
             <ImageBackground
                 source={require('../assets/backgroundProdutos.png')}
                 style={styles.background}
@@ -230,6 +250,50 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: "700",
         color: "#fff"
-    }
-
-});
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+      },
+      centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escuro
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+      },
+      closeButton: {
+        backgroundColor: '#2196F3',
+        borderRadius: 10,
+        padding: 10,
+        elevation: 2,
+      },
+      closeButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+      },
+    });

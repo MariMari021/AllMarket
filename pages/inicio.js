@@ -11,6 +11,7 @@ export function Inicio({ navigation }) {
     };
 
     return (
+
         <ScrollView style={{ flex: 1 }}>
         <View style={styles.container}>
             <View style={styles.parteBranca}>
@@ -20,14 +21,17 @@ export function Inicio({ navigation }) {
                         <Text style={styles.backText}>Pular</Text>
                         <Image source={require('../assets/setaDireita.png')} style={styles.backIcon} />
                     </TouchableOpacity>
+
+       
+                    </View>
+                    <Text style={styles.text}>Sua <Text style={styles.orangeText}>experiência</Text> de {'\n'}compras em <Text style={styles.greenText}>um toque!</Text></Text>
+                    <Image source={require('../assets/inicio.gif')} style={styles.imgPrincipal} />
+
                 </View>
-                <Text style={styles.text}>Sua <Text style={styles.orangeText}>experiência</Text> de {'\n'}compras em <Text style={styles.greenText}>um toque!</Text></Text>
-                <Image source={require('../assets/inicio.gif')} style={styles.imgPrincipal} />
+                <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
+                    <Text style={styles.buttonText}>Fazer Login</Text>
+                </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-                <Text style={styles.buttonText}>Fazer Login</Text>
-            </TouchableOpacity>
-        </View>
         </ScrollView>
     );
 };
