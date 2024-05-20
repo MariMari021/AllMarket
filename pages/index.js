@@ -51,28 +51,33 @@ export function Home({ route, navigation }) {
 
     const salvarLista = async () => {
         const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === categoriaParaSalvar);
-
+    
         if (produtosNaCategoria.length === 0) {
             // Exibe o modal informando que não há produtos na categoria selecionada
             setModalNenhumProdutoVisible(true);
             setModalSalvarVisible(false);
             return;
         }
-
+    
         const novaLista = {
             nome: nomeDaLista,
             categoria: categoriaParaSalvar,
             produtos: produtosNaCategoria,
             data: new Date().toISOString() // Convertendo data para string
         };
-
-        // Verifica se já existe uma lista com a mesma categoria e produtos
+    
+        // Verifica se já existe uma lista com a mesma categoria e produtos (comparando todas as propriedades dos produtos)
         const listaExistente = listasSalvas.some(lista =>
             lista.categoria === categoriaParaSalvar &&
             lista.produtos.length === produtosNaCategoria.length &&
-            lista.produtos.every((produto, index) => produto.id === produtosNaCategoria[index].id)
+            lista.produtos.every((produto, index) => 
+                produto.id === produtosNaCategoria[index].id &&
+                produto.nome === produtosNaCategoria[index].nome &&
+                produto.quantidade === produtosNaCategoria[index].quantidade &&
+                produto.preco === produtosNaCategoria[index].preco
+            )
         );
-
+    
         if (listaExistente) {
             // Exibe o modal informando que a categoria já foi salva com os mesmos produtos
             setModalCategoriaJaSalvaVisible(true);
@@ -83,9 +88,10 @@ export function Home({ route, navigation }) {
             await saveListas(novasListasSalvas);
             setModalListaSalva(true);
         }
-
+    
         setModalSalvarVisible(false);
     };
+    
 
 
 
@@ -118,20 +124,6 @@ export function Home({ route, navigation }) {
     useEffect(() => {
         saveListas(listasSalvas);
     }, [listasSalvas]);
-
-
-
-    const navegarLista = () => {
-        const atualizarListas = async (novasListas) => {
-            setListasSalvas(novasListas);
-            await saveListas(novasListas);
-        };
-
-        navigation.navigate('ListaSalva', { listasSalvas, atualizarListas });
-    };
-
-
-
 
 
 
@@ -385,7 +377,7 @@ export function Home({ route, navigation }) {
         setNomeProduto(produto.nome);
         setQuantidade(produto.quantidade);
         setPreco(produto.preco);
-
+    
         const index = produtosAdicionados.findIndex(p => p.id === produto.id);
         if (index !== -1) {
             const novosProdutosAdicionados = [...produtosAdicionados];
