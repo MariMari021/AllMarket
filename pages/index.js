@@ -824,10 +824,7 @@ export function Home({ route, navigation }) {
                     )}
                 </View>
 
-                <Text style={styles.salvarTexto} onPress={navegarLista}>
-                    Ver listas salvas
-                </Text>
-
+              
 
             </View>
         </ScrollView>
