@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, TouchableOpacity, AsyncStorage, StyleSheet, ImageBackground, Image } from 'react-native';
+import { useUser } from './UserContext';
 
-export function Login() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+export function Login({ navigation }) {
+  const { setUsername, setEmail, setPassword } = useUser();
   const [errorMessage, setErrorMessage] = useState('');
-  const navigation = useNavigation();
+  const { setUserId, setIsAnonymous } = useUser();
 
   const handleLogin = async () => {
     try {
       const userData = await AsyncStorage.getItem('userData');
       if (userData) {
-        const { email: storedEmail, password: storedPassword } = JSON.parse(userData);
+        const { email: storedEmail, password: storedPassword, userId } = JSON.parse(userData);
         if (storedEmail === email && storedPassword === password) {
+          setUserId(userId);
+          setIsAnonymous(false); // Usuário não é mais anônimo
           navigation.navigate('Home');
         } else {
           setErrorMessage('Email ou senha inválidos.');
@@ -27,6 +27,7 @@ export function Login() {
       console.error('Erro ao recuperar os dados do cadastro:', error);
     }
   };
+
 
   const navigateToCadastro = () => {
     navigation.navigate('Cadastro');
@@ -43,27 +44,24 @@ export function Login() {
         <View style={styles.containerForm}>
           <Text style={styles.welcomeText}>Seja bem-vindo (a) ao</Text>
           <View style={styles.textWithImage}>
-            
+
             <Image source={require('../assets/logo.png')} style={styles.icon} />
           </View>
           <TextInput
             style={styles.input}
             placeholder="Nome de Usuário"
-            value={username}
-            onChangeText={setUsername}
+            onChangeText={setUsername} // Use setUsername para atualizar o nome de usuário no contexto do usuário
           />
           <TextInput
             style={styles.input}
             placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
+            onChangeText={setEmail} // Use setEmail para atualizar o email no contexto do usuário
           />
           <TextInput
             style={styles.input}
             placeholder="Senha"
             secureTextEntry={true}
-            value={password}
-            onChangeText={setPassword}
+            onChangeText={setPassword} // Use setPassword para atualizar a senha no contexto do usuário
           />
           {errorMessage ? (
             <Text style={styles.errorMessage}>{errorMessage}</Text>
@@ -96,7 +94,7 @@ const styles = StyleSheet.create({
     height: '40%',
     justifyContent: 'flex-end',
   },
- 
+
   containerForm: {
     backgroundColor: '#FFF',
     borderTopLeftRadius: 25,

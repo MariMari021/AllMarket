@@ -25,9 +25,11 @@
     "react-dom": "18.2.0",
     "react-native": "0.73.6",
     "react-native-gesture-handler": "~2.14.0",
+    "react-native-get-random-values": "^1.11.0",
     "react-native-swiper": "^1.6.0",
     "react-native-video": "^6.0.0",
-    "react-native-web": "~0.19.6"
+    "react-native-web": "~0.19.6",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
