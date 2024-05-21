@@ -91,7 +91,8 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.containerLogo}>
-                    <Text style={styles.bemVindo}><Text style={styles.subtitulo}>Conheça +</Text> sobre qualidade Oba Hortifruti.</Text>
+                    <Text style={styles.bemVindo}><Text style={styles.subtitulo}>Lista</Text> Salva</Text>
+                    <Text style={styles.subtitle}>Consulte os as listas que você salvou anteriomente.</Text>
                 </View>
             </View>
 
@@ -403,6 +404,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingVertical:'35%'
     },
     emptyListText: {
         fontWeight: 'bold',
@@ -446,4 +448,8 @@ const styles = StyleSheet.create({
         fontWeight: "800",
         fontSize: 26
     },
+    subtitle: {
+        fontSize: 17,
+        color: '#666',
+      }
 });
