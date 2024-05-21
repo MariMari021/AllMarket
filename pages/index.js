@@ -21,7 +21,7 @@ export function Home({ route, navigation }) {
     const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
     // Defina um estado para a quantidade do produto
     const [quantidade, setQuantidade] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('Categoria1'); // Define "Categoria1" como categoria inicial selecionada
+    const [selectedCategory, setSelectedCategory] = useState('Variados'); // Define "Categoria1" como categoria inicial selecionada
     const [scrollStates, setScrollStates] = useState({});
     const [nomeProduto, setNomeProduto] = useState('');
     const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
@@ -229,21 +229,21 @@ export function Home({ route, navigation }) {
 
     const getCategoryScrollView = (category) => {
         switch (category) {
-            case 'Categoria1':
+            case 'Variados':
                 return renderCategoryScrollView(category, require('../assets/imgCard1.png'));
-            case 'Categoria2':
+            case 'Hortifruti':
                 return renderCategoryScrollView(category, require('../assets/frutas.png'));
-            case 'Categoria3':
+            case 'Adega':
                 return renderCategoryScrollView(category, require('../assets/adega.png'));
-            case 'Categoria4':
+            case 'Padaria':
                 return renderCategoryScrollView(category, require('../assets/padaria.png'));
-            case 'Categoria5':
+            case 'Açougue':
                 return renderCategoryScrollView(category, require('../assets/acougue.png'));
-            case 'Categoria6':
+            case 'Mercearia':
                 return renderCategoryScrollView(category, require('../assets/mercearia.png'));
-            case 'Categoria7':
+            case 'Frios':
                 return renderCategoryScrollView(category, require('../assets/frios.png'));
-            case 'Categoria8':
+            case 'Outros':
                 return renderCategoryScrollView(category, require('../assets/outros.png'));
             // Adicione mais casos conforme necessário para outras categorias
             default:
@@ -494,11 +494,11 @@ export function Home({ route, navigation }) {
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <TouchableOpacity style={[
                                 styles.adicionarMercado,
-                                selectedCategory === 'Categoria1' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria1')}>
+                                selectedCategory === 'Variados' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Variados')}>
                                 <Text style={[
                                     styles.adicionarMercadoTexto,
-                                    selectedCategory === 'Categoria1' && { color: 'white' },
+                                    selectedCategory === 'Variados' && { color: 'white' },
                                 ]}>
                                     Variados
                                 </Text>
@@ -506,77 +506,77 @@ export function Home({ route, navigation }) {
                             <TouchableOpacity
                                 style={[
                                     styles.adicionarHortifruti,
-                                    selectedCategory === 'Categoria2' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                                    selectedCategory === 'Hortifruti' && { backgroundColor: "#7DBF4E", borderColor: "white" },
                                 ]}
-                                onPress={() => handleCategoryPress('Categoria2')}>
+                                onPress={() => handleCategoryPress('Hortifruti')}>
                                 <Text style={[
                                     styles.adicionarHortifrutiTexto,
-                                    selectedCategory === 'Categoria2' && { color: 'white' },
+                                    selectedCategory === 'Hortifruti' && { color: 'white' },
                                 ]}>Hortifruti</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity style={[
                                 styles.adicionarAdega,
-                                selectedCategory === 'Categoria3' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria3')} >
+                                selectedCategory === 'Adega' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Adega')} >
                                 <Text style={[
                                     styles.adicionarAdegaTexto,
-                                    selectedCategory === 'Categoria3' && { color: 'white' },
+                                    selectedCategory === 'Adega' && { color: 'white' },
                                 ]}>
                                     Adega
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
                                 styles.adicionarPadaria,
-                                selectedCategory === 'Categoria4' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria4')} >
+                                selectedCategory === 'Padaria' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Padaria')} >
                                 <Text style={[
                                     styles.adicionarPadariaTexto,
-                                    selectedCategory === 'Categoria4' && { color: 'white' },
+                                    selectedCategory === 'Padaria' && { color: 'white' },
                                 ]}>
                                     Padaria
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
                                 styles.adicionarAcougue,
-                                selectedCategory === 'Categoria5' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria5')}>
+                                selectedCategory === 'Açougue' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Açougue')}>
                                 <Text style={[
                                     styles.adicionarAcougueTexto,
-                                    selectedCategory === 'Categoria5' && { color: 'white' },
+                                    selectedCategory === 'Açougue' && { color: 'white' },
                                 ]}>
                                     Açougue
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
                                 styles.adicionarMercearia,
-                                selectedCategory === 'Categoria6' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria6')}>
+                                selectedCategory === 'Mercearia' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Mercearia')}>
                                 <Text style={[
                                     styles.adicionarMerceariaTexto,
-                                    selectedCategory === 'Categoria6' && { color: 'white' },
+                                    selectedCategory === 'Mercearia' && { color: 'white' },
                                 ]}>
                                     Mercearia
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
                                 styles.adicionarFrios,
-                                selectedCategory === 'Categoria7' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria7')} >
+                                selectedCategory === 'Frios' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Frios')} >
                                 <Text style={[
                                     styles.adicionarFriosTexto,
-                                    selectedCategory === 'Categoria7' && { color: 'white' },
+                                    selectedCategory === 'Frios' && { color: 'white' },
                                 ]}>
                                     Frios
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[
                                 styles.adicionarOutros,
-                                selectedCategory === 'Categoria8' && { backgroundColor: "#7DBF4E", borderColor: "white" },
-                            ]} onPress={() => handleCategoryPress('Categoria8')}>
+                                selectedCategory === 'Outros' && { backgroundColor: "#7DBF4E", borderColor: "white" },
+                            ]} onPress={() => handleCategoryPress('Outros')}>
                                 <Text style={[
                                     styles.adicionarOutrosTexto,
-                                    selectedCategory === 'Categoria8' && { color: 'white' },
+                                    selectedCategory === 'Outros' && { color: 'white' },
                                 ]}>
                                     Outros
                                 </Text>
@@ -645,7 +645,7 @@ export function Home({ route, navigation }) {
                             <ScrollView style={styles.categoriaScrollViewSalvar}
                                 showsHorizontalScrollIndicator={true}
                                 persistentScrollbar={true}>
-                                {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                {['Variados', 'Hortifruti', 'Adega', 'Padaria', 'Açougue', 'Mercearia', 'Frios', 'Outros'].map((categoria) => (
                                     <TouchableOpacity
                                         key={categoria}
                                         style={[
@@ -730,7 +730,7 @@ export function Home({ route, navigation }) {
                                 showsHorizontalScrollIndicator={true}
                                 persistentScrollbar={true}
                             >
-                                {['Categoria1', 'Categoria2', 'Categoria3', 'Categoria4', 'Categoria5', 'Categoria6', 'Categoria7', 'Categoria8'].map((categoria) => (
+                                {['Variados', 'Hortifruti', 'Adega', 'Padaria', 'Açougue', 'Mercearia', 'Frios', 'Outros'].map((categoria) => (
                                     <TouchableOpacity
                                         key={categoria}
                                         style={[

@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useListas } from './ListasContext';
 import { useUser } from './UserContext';
 
-export function ListaSalva({ route }) {
+export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedLista, setSelectedLista] = useState(null);
@@ -16,10 +16,10 @@ export function ListaSalva({ route }) {
 
     useEffect(() => {
         if (route.params?.listasSalvas) {
-          setListasSalvas(route.params.listasSalvas);
-          saveListas(route.params.listasSalvas); // Salva as listas ao receber novas do parâmetro
+            setListasSalvas(route.params.listasSalvas);
+            saveListas(route.params.listasSalvas); // Salva as listas ao receber novas do parâmetro
         }
-      }, [route.params?.listasSalvas]);
+    }, [route.params?.listasSalvas]);
 
     useEffect(() => {
         carregarListasSalvas(); // Carrega as listas salvas ao iniciar o componente
@@ -27,32 +27,32 @@ export function ListaSalva({ route }) {
 
     const salvarListas = async (listas, userId) => {
         try {
-          const jsonValue = JSON.stringify(listas);
-          await AsyncStorage.setItem(`@listasSalvas_${userId}`, jsonValue);
+            const jsonValue = JSON.stringify(listas);
+            await AsyncStorage.setItem(`@listasSalvas_${userId}`, jsonValue);
         } catch (error) {
-          console.error('Erro ao salvar as listas: ', error);
+            console.error('Erro ao salvar as listas: ', error);
         }
-      };
+    };
 
-      const carregarListasSalvas = async (userId) => {
+    const carregarListasSalvas = async (userId) => {
         try {
-          const listasSalvasString = await AsyncStorage.getItem(`@listasSalvas_${userId}`);
-          if (listasSalvasString !== null) {
-            setListasSalvas(JSON.parse(listasSalvasString));
-          }
+            const listasSalvasString = await AsyncStorage.getItem(`@listasSalvas_${userId}`);
+            if (listasSalvasString !== null) {
+                setListasSalvas(JSON.parse(listasSalvasString));
+            }
         } catch (error) {
-          console.error('Erro ao carregar as listas salvas: ', error);
+            console.error('Erro ao carregar as listas salvas: ', error);
         }
-      };
+    };
 
-      useEffect(() => {
+    useEffect(() => {
         const fetchListas = async () => {
-          if (userId) {
-            await carregarListasSalvas(userId);
-          }
+            if (userId) {
+                await carregarListasSalvas(userId);
+            }
         };
         fetchListas();
-      }, [userId]);
+    }, [userId]);
 
     const handleListaPress = (lista) => {
         setSelectedLista(lista);
@@ -66,26 +66,32 @@ export function ListaSalva({ route }) {
         setModalExcluirVisible(false);
         await saveListas(novasListas); // Salva as listas após excluir
         if (route.params?.atualizarListas) {
-          route.params.atualizarListas(novasListas);
+            route.params.atualizarListas(novasListas);
         }
         navigation.navigate('ListaSalva', { listasSalvas: novasListas });
-      };
+    };
+
+    const handleNavigateToCompras = () => {
+        navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
+    };
 
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.topBar}>
-                <View style={styles.iconContainer}>
-                    <Image source={require('../assets/profile.png')} style={styles.iconeTopo} />
-                    <Image source={require('../assets/sacola.png')} style={styles.iconeTopo2} />
+            <View style={styles.header}>
+                <View style={styles.headerInicio}>
+                    <Image
+                        style={styles.profile}
+                        source={require('../assets/profile.png')}
+                    />
+                    <TouchableOpacity onPress={handleNavigateToCompras}>
+                        <Image
+                            style={styles.sacola}
+                            source={require('../assets/sacola.png')}
+                        />
+                    </TouchableOpacity>
                 </View>
-                <View style={styles.header}>
-                    <Text style={styles.greeting}>
-                        Listas
-                        <Text style={styles.greenText}> Salvas </Text>
-                    </Text>
-                    <Text style={styles.subtitle}>
-                        Consulte as listas que você salvou anteriormente.
-                    </Text>
+                <View style={styles.containerLogo}>
+                    <Text style={styles.bemVindo}><Text style={styles.subtitulo}>Conheça +</Text> sobre qualidade Oba Hortifruti.</Text>
                 </View>
             </View>
 
@@ -241,7 +247,7 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         paddingHorizontal: 20,
     },
-    greenText: {
+    subtitulo: {
         color: '#0B8C38',
         fontWeight: 'bold',
     },
@@ -411,5 +417,33 @@ const styles = StyleSheet.create({
         maxHeight: 250,
         width: '100%',
         marginBottom: 20,
-    }
+    },
+    header: {
+        backgroundColor: "#fff",
+        borderBottomEndRadius: 35,
+        borderBottomStartRadius: 35,
+        padding: 40,
+        borderWidth: 1,
+        borderColor: 'rgba(0, 0, 0, 0.16)'
+    },
+    headerInicio: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
+    },
+    profile: {
+        width: 45,
+        height: 45
+    },
+    sacola: {
+        width: 30,
+        height: 30
+    },
+    bemVindo: {
+        paddingTop: 20,
+        color: 'rgba(0, 0, 0, 0.62)',
+        fontFamily: "Inter",
+        fontWeight: "800",
+        fontSize: 26
+    },
 });

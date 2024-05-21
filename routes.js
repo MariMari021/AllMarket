@@ -12,7 +12,7 @@ import { CardAdicionado } from './pages/cardAdicionado';
 import { Inicio } from './pages/inicio';
 import { ListaSalva } from './pages/listaSalva';
 import { Tutorial } from './pages/tutorial';
-import {Sobre} from './pages/sobre'
+import { Sobre } from './pages/sobre'
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -33,7 +33,7 @@ function CustomTabBarIcon({ focused, source, label, iconWidth, iconHeight }) {
   );
 }
 
- 
+
 
 function MainTabNavigator() {
   return (
@@ -66,22 +66,7 @@ function MainTabNavigator() {
           ),
         }}
       />
-      <Tab.Screen
-        name="Sobre"
-        component={Sobre}
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <CustomTabBarIcon
-              focused={focused}
-              source={require('./assets/orange.png')}
-              label="Oba"
-              iconWidth={26}
-              iconHeight={25}
-            />
-          ),
-        }}
-      />
+
       <Tab.Screen
         name="ListaSalva"
         component={ListaSalva}
@@ -94,6 +79,22 @@ function MainTabNavigator() {
               label="Listas"
               iconWidth={26}
               iconHeight={26}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Sobre"
+        component={Sobre}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <CustomTabBarIcon
+              focused={focused}
+              source={require('./assets/orange.png')}
+              label="Oba"
+              iconWidth={26}
+              iconHeight={25}
             />
           ),
         }}
@@ -145,8 +146,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 93, 0, 0.75)',
     borderRadius: 20,
-    width:110,
-    height:40
+    width: 110,
+    height: 40
   },
   focusedLabel: {
     color: '#fff',
