@@ -12,6 +12,7 @@ import { CardAdicionado } from './pages/cardAdicionado';
 import { Inicio } from './pages/inicio';
 import { ListaSalva } from './pages/listaSalva';
 import { Tutorial } from './pages/tutorial';
+import {Sobre} from './pages/sobre'
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -21,7 +22,7 @@ function CustomTabBarIcon({ focused, source, label, iconWidth, iconHeight }) {
     <View style={[styles.iconContainer, focused && styles.focusedContainer]}>
       <Image
         source={source}
-        style={{ width: iconWidth, height: iconHeight, tintColor: focused ? '#fff' : '#222' }}
+        style={{ width: iconWidth, height: iconHeight, tintColor: focused ? '#fff' : "#0B8C38" }}
       />
       {focused && (
         <Text style={styles.focusedLabel}>
@@ -66,17 +67,17 @@ function MainTabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Compras"
-        component={Compras}
+        name="Sobre"
+        component={Sobre}
         options={{
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <CustomTabBarIcon
               focused={focused}
-              source={require('./assets/sacola.png')}
-              label="Compras"
-              iconWidth={21}
-              iconHeight={21}
+              source={require('./assets/orange.png')}
+              label="Oba"
+              iconWidth={26}
+              iconHeight={25}
             />
           ),
         }}
@@ -128,6 +129,7 @@ function AppNavigator() {
       <Stack.Screen name="CardAdicionado" component={CardAdicionado} options={{ headerShown: false }} />
       <Stack.Screen name="Inicio" component={Inicio} options={{ headerShown: false }} />
       <Stack.Screen name="Tutorial" component={Tutorial} options={{ headerShown: false }} />
+      <Stack.Screen name="Compras" component={Compras} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
