@@ -32,7 +32,8 @@ export function Home({ route, navigation }) {
     const [categoriaParaSalvar, setCategoriaParaSalvar] = useState('');
     const [nomeDaLista, setNomeDaLista] = useState('');
     const [listasSalvas, setListasSalvas] = useState([]);
-
+    const [modalListaExistenteVisible, setModalListaExistenteVisible] = useState(false);
+    const [modalListaSalvaSucessoVisible, setModalListaSalvaSucessoVisible] = useState(false);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -51,49 +52,65 @@ export function Home({ route, navigation }) {
 
     const salvarLista = async () => {
         const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === categoriaParaSalvar);
-    
+
         if (produtosNaCategoria.length === 0) {
-            // Exibe o modal informando que não há produtos na categoria selecionada
             setModalNenhumProdutoVisible(true);
             setModalSalvarVisible(false);
             return;
         }
-    
+
         const novaLista = {
             nome: nomeDaLista,
             categoria: categoriaParaSalvar,
             produtos: produtosNaCategoria,
-            data: new Date().toISOString() // Convertendo data para string
+            data: new Date().toISOString(),
         };
-    
+      
         // Verifica se já existe uma lista com a mesma categoria e produtos (comparando todas as propriedades dos produtos)
         const listaExistente = listasSalvas.some(lista =>
+            lista.nome === nomeDaLista &&
             lista.categoria === categoriaParaSalvar &&
             lista.produtos.length === produtosNaCategoria.length &&
-            lista.produtos.every((produto, index) => 
-                produto.id === produtosNaCategoria[index].id &&
+            lista.produtos.every((produto, index) => (
                 produto.nome === produtosNaCategoria[index].nome &&
                 produto.quantidade === produtosNaCategoria[index].quantidade &&
                 produto.preco === produtosNaCategoria[index].preco
-            )
+            ))
         );
-    
+
+
         if (listaExistente) {
-            // Exibe o modal informando que a categoria já foi salva com os mesmos produtos
-            setModalCategoriaJaSalvaVisible(true);
-        } else {
-            // Adiciona a nova lista e salva
-            const novasListasSalvas = [...listasSalvas, novaLista];
-            setListasSalvas(novasListasSalvas);
-            await saveListas(novasListasSalvas);
-            setModalListaSalva(true);
+            setModalListaExistenteVisible(true);
+            setModalSalvarVisible(false);
+            return;
         }
-    
+
+        const novasListasSalvas = [...listasSalvas, novaLista];
+        setListasSalvas(novasListasSalvas);
+        await AsyncStorage.setItem('@listasSalvas', JSON.stringify(novasListasSalvas));
         setModalSalvarVisible(false);
+        setModalListaSalvaSucessoVisible(true); // Exibe o modal de sucesso
+
+        // Navega para a tela "ListaSalva" e passa as listas salvas atualizadas como parâmetro
+        navigation.navigate('ListaSalva', { listasSalvas: novasListasSalvas });
     };
-    
 
 
+    useFocusEffect(
+        React.useCallback(() => {
+            const carregarListasSalvas = async () => {
+                try {
+                    const listasSalvasString = await AsyncStorage.getItem('@listasSalvas');
+                    if (listasSalvasString !== null) {
+                        setListasSalvas(JSON.parse(listasSalvasString));
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar as listas salvas: ', error);
+                }
+            };
+            carregarListasSalvas();
+        }, [])
+    );
 
     const saveListas = async (listas) => {
         try {
@@ -373,7 +390,7 @@ export function Home({ route, navigation }) {
         setNomeProduto(produto.nome);
         setQuantidade(produto.quantidade);
         setPreco(produto.preco);
-    
+
         const index = produtosAdicionados.findIndex(p => p.id === produto.id);
         if (index !== -1) {
             const novosProdutosAdicionados = [...produtosAdicionados];
@@ -816,7 +833,7 @@ export function Home({ route, navigation }) {
                     )}
                 </View>
 
-              
+
 
             </View>
         </ScrollView>
@@ -1303,7 +1320,7 @@ const styles = StyleSheet.create({
         width: '80%',
     },
     modalTitleLimpar: {
-        color:"#0B8C38",
+        color: "#0B8C38",
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,

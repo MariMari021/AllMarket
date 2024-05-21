@@ -1,19 +1,18 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Image, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-web';
+import { View, StyleSheet, TouchableOpacity, Text, Image, ScrollView, SafeAreaView } from 'react-native';
 
 export function Inicio({ navigation }) {
     const handleLoginPress = () => {
-        navigation.navigate('Login');
+        navigation.navigate('Cadastro');
     };
 
     const handleBackPress = () => {
-        navigation.navigate('Home'); // Navega de volta para a página Index
+        navigation.navigate('Main'); // Navega de volta para a página Index
     };
 
     return (
-        <SafeAreaView style={{backgroundColor:'#fff'}}>
-            <ScrollView style={{ flex: 1 }}>
+        <SafeAreaView style={styles.safeArea}>
+            <ScrollView contentContainerStyle={styles.scrollView}>
                 <View style={styles.container}>
                     <View style={styles.parteBranca}>
                         <View style={styles.header}>
@@ -22,12 +21,9 @@ export function Inicio({ navigation }) {
                                 <Text style={styles.backText}>Pular</Text>
                                 <Image source={require('../assets/setaDireita.png')} style={styles.backIcon} />
                             </TouchableOpacity>
-
-
                         </View>
                         <Text style={styles.text}>Sua <Text style={styles.orangeText}>experiência</Text> de {'\n'}compras em <Text style={styles.greenText}>um toque!</Text></Text>
                         <Image source={require('../assets/inicio.gif')} style={styles.imgPrincipal} />
-
                     </View>
                     <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
                         <Text style={styles.buttonText}>Fazer Login</Text>
@@ -39,25 +35,30 @@ export function Inicio({ navigation }) {
 };
 
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
         backgroundColor: '#0B8C38',
+    },
+    scrollView: {
+        flexGrow: 1,
+    },
+    container: {
+        flex: 1,
         alignItems: 'center',
     },
     parteBranca: {
         backgroundColor: 'white',
         width: '100%',
-        height: '83%',
         paddingStart: '8%',
         paddingEnd: '8%',
         paddingTop: '12%',
-        paddingBottom: '42%',
+        paddingBottom: '22%',
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
     },
     logo: {
         width: 155,
-        height: 35
+        height: 35,
     },
     header: {
         flexDirection: 'row',
@@ -77,16 +78,15 @@ const styles = StyleSheet.create({
         marginRight: 5,
         color: '#5F5F5F',
         fontWeight: 'bold',
-        fontSize: 16
+        fontSize: 16,
     },
     text: {
         color: '#5F5F5F',
         fontSize: 25,
         fontWeight: 'bold',
         textAlign: 'center',
-        alignItems: 'center',
         marginTop: 80,
-        marginBottom: '37%'
+        marginBottom: '37%',
     },
     orangeText: {
         color: '#F26E22',
@@ -106,15 +106,15 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         width: 310,
         height: 50,
-        top: '5%'
+        marginTop: 34,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     buttonText: {
         color: '#F26E22',
         fontSize: 18,
         fontWeight: 'bold',
-        textAlign: 'center',
-        top: 10
     },
-
 });
+
 

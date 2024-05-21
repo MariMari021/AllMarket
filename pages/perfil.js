@@ -1,24 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useUser } from './UserContext';
-import { useListas } from './ListasContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useListas } from './ListasContext'; // Importe o contexto das listas
 
 export function Perfil() {
-  const { userId, logout: userLogout } = useUser();
-  const { logout: listasLogout } = useListas();
-  const [userData, setUserData] = useState({ username: '', email: '', password: '' });
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigation = useNavigation();
-
+  const { listasSalvas, totalProdutos } = useListas(); // Use o contexto das listas
+  const [userData, setUserData] = useState({ username: '', email: '', password: '' });
   useEffect(() => {
     const getUserData = async () => {
       try {
+        // Recuperando os dados salvos do AsyncStorage
         const storedUserData = await AsyncStorage.getItem('userData');
         if (storedUserData) {
           setUserData(JSON.parse(storedUserData));
-          setIsLoggedIn(true);
         }
       } catch (error) {
         console.error('Erro ao recuperar os dados do cadastro:', error);
@@ -28,131 +24,111 @@ export function Perfil() {
     getUserData();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      console.log('Calling handleLogout');
-      await AsyncStorage.removeItem('userData');
-      setUserData({ username: '', email: '', password: '' });
-      setIsLoggedIn(false);
-      await listasLogout(userId); // Call logout from ListasContext with userId
-      await userLogout(); // Call logout from UserContext
-      console.log('Logout successful');
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error);
-    }
+  const numListasSalvas = listasSalvas.length;
+  const [produtosAdicionados, setProdutosAdicionados] = useState([]); // Estado para armazenar os produtos adicionados
+
+  const numProdutosAdicionados = produtosAdicionados.length; // Calcula o número de produtos adicionados
+
+
+  const firstName = userData.username.split(' ')[0];
+  const handleNavigateToCompras = () => {
+    navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
   };
 
-
-
   return (
-    <ScrollView style={{ height: 50 }}>
-      <View style={styles.container}>
-        <View style={styles.topBar}>
-          <View style={styles.iconContainer}>
-            <Image source={require('../assets/profile.png')} style={styles.iconeTopo} />
-            <Image source={require('../assets/sacola.png')} style={styles.iconeTopo} />
-          </View>
-          <View style={styles.header}>
-            <Text style={styles.greeting}>
-              Olá, 
-              <Text style={styles.username}> {userData.username ? userData.username.split(' ')[0] : ' usuário'}
-              </Text>
-              <Image source={require('../assets/ola.png')} style={styles.ola} />
-            </Text>
-            <Text style={styles.subtitle}>Consulte os seus dados.</Text>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.header2}>
+        <View style={styles.headerInicio}>
+          <Image
+            style={styles.profile}
+            source={require('../assets/profile.png')}
+          />
+          <TouchableOpacity onPress={handleNavigateToCompras}>
+            <Image
+              style={styles.sacola}
+              source={require('../assets/sacola.png')}
+            />
+          </TouchableOpacity>
         </View>
-        <View style={styles.tudo}>
-          {isLoggedIn ? (
-            <>
-              <View style={styles.cardContainer}>
-                <View style={styles.card}>
-                  <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text> {'\n'}na lista</Text>
-                  <View style={styles.cardContent}>
-                    <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
-                    <Text style={styles.cardNumber}>{totalProdutos}</Text>
-                  </View>
-                  <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListaSalva')}>
-                    <Text style={styles.buttonText}>Ver Mais</Text>
-                    <Image source={require('../assets/setaLaranja.png')} style={styles.buttonIcon} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.card2}>
-                  <Text style={styles.cardTitle2}><Text style={styles.greenText}>Listas</Text> adicionadas</Text>
-                  <View style={styles.cardContent}>
-                    <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
-                    <Text style={styles.cardNumber2}>{listasSalvas.length}</Text>
-                  </View>
-                  <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('ListaSalva')}>
-                    <Text style={styles.buttonText}>Ver Mais</Text>
-                    <Image source={require('../assets/setaVerde.png')} style={styles.buttonIcon} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={styles.sectionTitleContainer}>
-                <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
-              </View>
-              <View style={styles.inputContainer}>
-                <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
-              </View>
-              <View style={styles.inputContainer}>
-                <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Email" value={userData.email} />
-              </View>
-              <View style={styles.inputContainer}>
-                <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
-                <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
-              </View>
-              <TouchableOpacity onPress={handleLogout}>
-                <Text style={styles.logoutButton}>Sair do login</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.tutorialButton} onPress={() => navigation.navigate('Tutorial')}>
-                <Text style={styles.tutorialButtonText}>Acesse o tutorial</Text>
-                <Image source={require('../assets/tutorialIcon.png')} style={styles.tutorialButtonIcon} />
-              </TouchableOpacity>
-            </>
-          ) : (
-            <View style={styles.loginPromptContainer}>
-              <Text style={styles.loginPromptText}>
-                Faça <Text style={styles.loginHighlight}>login</Text> para aparecer os dados sobre suas listas!
-              </Text>
-              <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginButtonText}>Fazer Login</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+
+        <View style={styles.header}>
+          <Text style={styles.greeting}>Olá, <Text style={styles.userName}>{firstName}</Text> <Image source={require('../assets/ola.png')} style={styles.ola} /> </Text>
+          <Text style={styles.subtitle}>Consulte os seus dados.</Text>
         </View>
       </View>
-    </ScrollView>
+      <View style={styles.tudo}>
+        <View style={styles.cardContainer}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text>{'\n'}na lista</Text>
+            <View style={styles.cardContent}>
+              <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
+              <Text style={styles.cardNumber}>{totalProdutos}</Text>
+            </View>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListaSalva')}>
+              <Text style={styles.buttonText}>Ver Mais</Text>
+              <Image source={require('../assets/setaLaranja.png')} style={styles.buttonIcon} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.card2}>
+            <Text style={styles.cardTitle2}><Text style={styles.greenText}>Listas</Text> adicionadas</Text>
+            <View style={styles.cardContent}>
+              <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
+              <Text style={styles.cardNumber2}>{numListasSalvas}</Text>
+            </View>
+            <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('ListaSalva')}>
+              <Text style={styles.buttonText}>Ver Mais</Text>
+              <Image source={require('../assets/setaVerde.png')} style={styles.buttonIcon} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.sectionTitleContainer}>
+          <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
+        </View>
+        <View style={styles.inputContainer}>
+          <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
+          <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
+        </View>
+        <View style={styles.inputContainer}>
+          <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
+          <TextInput style={styles.input} placeholder="Email" value={userData.email} />
+        </View>
+        <View style={styles.inputContainer}>
+          <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
+          <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
+        </View>
+      </View>
+
+    </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9F9F9',
   },
-  tudo: {
-    padding: 16,
+  headerInicio: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center"
   },
-  username: {
-    color: '#0B8C38', 
+  profile: {
+    width: 45,
+    height: 45
   },
-  iconeTopo: {
-    marginTop: 40,
-    width: 40,
-    height: 40,
+  sacola: {
+    width: 30,
+    height: 30
   },
-  topBar: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    padding: 20,
-    marginBottom: 20,
+  header2: {
+    backgroundColor: "#fff",
     borderBottomEndRadius: 35,
     borderBottomStartRadius: 35,
-    backgroundColor: '#fff',
+    padding: 40,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.16)'
+
   },
   iconContainer: {
     flexDirection: 'row',
@@ -165,10 +141,10 @@ const styles = StyleSheet.create({
     height: 30,
   },
   greeting: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginLeft: 10,
     color: '#5F5F5F',
+    top: 20
   },
   userName: {
     color: '#007B3A',
@@ -176,35 +152,41 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#666',
-    marginLeft: 10,
+    top: 20
+  },
+  tudo: {
+    padding: 20
   },
   cardContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
     marginHorizontal: 16,
+    top: 20
   },
   card: {
     width: '48%',
     padding: 16,
     backgroundColor: '#0B8C38',
-    borderRadius: 20,
+    borderRadius: 25,
+    alignItems: 'center',
   },
   card2: {
     width: '48%',
     padding: 16,
     backgroundColor: '#fff',
-    borderRadius: 20,
+    borderRadius: 25,
+    alignItems: 'center',
     borderColor: '#ccc',
     borderWidth: 1,
   },
   cardTitle: {
-    fontSize: 19,
+    fontSize: 16,
     color: '#EAEAEA',
     fontWeight: 'bold',
   },
   cardTitle2: {
-    fontSize: 19,
+    fontSize: 16,
     color: '#5F5F5F',
     fontWeight: 'bold',
   },
@@ -213,14 +195,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   yellowText: {
-    color: '#F7AB38',
+    color: '#F26E22',
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 20,
   },
   greenText: {
     color: '#0B8C38',
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 20,
   },
   cardNumber: {
     fontSize: 45,
@@ -245,9 +227,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: '#88B887',
     borderRadius: 20,
-    width: 150,
+    width: 130,
     height: 40,
-    marginLeft: -6,
   },
   button2: {
     marginTop: 10,
@@ -257,18 +238,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: '#F4884A',
     borderRadius: 20,
-    width: 150,
+    width: 130,
     height: 40,
-    marginLeft: -6,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 17,
-    flex: 1,
+    fontSize: 14,
+    flex: 1,  // To make the text take up available space
     textAlign: 'center',
   },
   buttonIcon: {
-    width: 32,
+    width: 33,
     height: 30,
   },
   sectionTitleContainer: {
@@ -278,11 +258,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 21,
     fontWeight: 'bold',
     marginRight: 5,
     color: '#5F5F5F',
+    top: 20,
+    marginBottom: 20
   },
+
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -304,88 +287,4 @@ const styles = StyleSheet.create({
     height: 33,
     marginRight: 8,
   },
-  logoutButton: {
-    backgroundColor: '#fff',
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#F4884A',
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 13,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginBottom: 20,
-    marginHorizontal: 16,
-  },
-  loginPromptContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    marginTop: 200, // Ajuste para centralizar verticalmente conforme necessário
-  },
-  loginPromptText: {
-    fontSize: 20,
-    color: '#666',
-    marginBottom: 20,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    paddingEnd: 40,
-    paddingStart: 40
-  },
-  loginHighlight: {
-    color: '#F26E22', // Cor laranja
-    fontWeight: 'bold',
-    fontSize: 20
-  },
-  loginButton: {
-    backgroundColor: '#0B8C38',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 15,
-    width: 200,
-    height: 40
-  },
-  loginButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center'
-  },
-  tutorialButton: {
-    backgroundColor: '#FF7300',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 13,
-    marginTop: 20,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginHorizontal: 16,
-  },
-  tutorialButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
-  tutorialButtonIcon: {
-    width: 20,
-    height: 20,
-  },
 });
-

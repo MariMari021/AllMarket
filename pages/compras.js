@@ -74,7 +74,7 @@ export function Compras({ navigation }) {
                 style={styles.profile}
                 source={require('../assets/profile.png')}
               />
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Main')}>
                 <Image
                   style={styles.sacola}
                   source={require('../assets/homeIcon.png')}
@@ -86,6 +86,8 @@ export function Compras({ navigation }) {
             </View>
           </View>
 
+
+        <View style={styles.cordefundo}>
           {nenhumValorDefinido ? (
             <View style={styles.mensagemContainer}>
               <Text style={styles.mensagem}>
@@ -191,6 +193,7 @@ export function Compras({ navigation }) {
               </View>
             </>
           )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -206,6 +209,9 @@ const styles = StyleSheet.create({
     padding: 40,
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.16)'
+  },
+  cordefundo:{
+    backgroundColor: '#f9f9f9',
   },
   headerInicio: {
     flexDirection: "row",
@@ -246,10 +252,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     paddingBottom: 10,
+    fontWeight: 'bold',
+    color: '#5f5f5f'
   },
   nenhumText: {
     color: "#0B8C38",
-    fontWeight: '800'
+    fontWeight: 'bold'
   },
   containerValorTotal: {
     paddingStart: 40,

@@ -1,31 +1,45 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground, Image } from 'react-native';
+import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import uuidv4 from './uuidConfig';
-import { useUser } from './UserContext';
+import { SafeAreaView } from 'react-native-web';
 
-export function Cadastro( {navigation} ) {
+export function Cadastro() {
   const [username, setUsername] = useState('');
   const [birthday, setBirthday] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { setUserId, setIsAnonymous } = useUser();
+  const navigation = useNavigation();
 
-  const handleUsernameChange = (text) => setUsername(text);
-  const handleBirthdayChange = (text) => setBirthday(text.replace(/[^\d/]/g, ''));
-  const handlePhoneChange = (text) => setPhone(text.replace(/[^\d]/g, ''));
+  const handleUsernameChange = (text) => {
+    setUsername(text);
+  };
+
+  const handleBirthdayChange = (text) => {
+    text = text.replace(/[^\d/]/g, '');
+    setBirthday(text);
+  };
+
+  const handlePhoneChange = (text) => {
+    text = text.replace(/[^\d]/g, '');
+    setPhone(text);
+  };
+
   const handleEmailChange = (text) => {
     setEmail(text);
+  
     if (!text.includes('@')) {
       setErrorMessage('Por favor, insira um email válido.');
     } else {
       setErrorMessage('');
     }
   };
+
   const handlePasswordChange = (text) => {
     setPassword(text);
+
     if (text.length !== 8 || !/[!@#$%]/.test(text)) {
       setErrorMessage('A senha deve ter 8 caracteres e conter pelo menos um símbolo (!@#$%).');
     } else {
@@ -38,26 +52,23 @@ export function Cadastro( {navigation} ) {
       setErrorMessage('Por favor, preencha todos os campos corretamente.');
       return;
     }
-
+  
     try {
-      const userId = uuidv4(); // Use a função uuidv4 importada para gerar um UUID para o ID do usuário
-      const userData = { userId, username, birthday, phone, email, password };
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
-      setUserId(userId);
-      setIsAnonymous(false); // Usuário não é mais anônimo
-      navigation.navigate('Home');
+      // Salvando os dados do cadastro no AsyncStorage
+      await AsyncStorage.setItem('userData', JSON.stringify({ username, email, password }));
+      navigation.navigate('Main');
       setErrorMessage('');
     } catch (error) {
       console.error('Erro ao salvar os dados do cadastro:', error);
     }
   };
 
-
   const handleBackPress = () => {
-    navigation.navigate('Home');
+    navigation.goBack();
   };
 
   return (
+   
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <ImageBackground
@@ -65,7 +76,7 @@ export function Cadastro( {navigation} ) {
           style={styles.backgroundImage}
         >
           <View style={styles.formContainer}>
-            <Text style={styles.welcomeText}>Cadastre-se agora!</Text>
+            <Text style={styles.welcomeText}>Cadastre-se agora para {'\n'}uma melhor experiência!</Text>
             <Image source={require('../assets/logo.png')} style={styles.image} />
             <TextInput
               style={styles.input}
@@ -75,7 +86,7 @@ export function Cadastro( {navigation} ) {
             />
             <TextInput
               style={styles.input}
-              placeholder="(dd/mm/aaaa)"
+              placeholder="Data de Nascimento (dd/mm/aaaa)"
               value={birthday}
               onChangeText={handleBirthdayChange}
             />
@@ -114,19 +125,14 @@ export function Cadastro( {navigation} ) {
               style={styles.backButton}
               onPress={handleBackPress}
             >
-              <Image source={require('../assets/seta_esquerda.png')} style={styles.backButtonText} />
+              <Image source={require('../assets/seta_esquerda.png')} style={styles.backButtonSeta} />
             </TouchableOpacity>
           </View>
-
-
         </ImageBackground>
       </View>
     </ScrollView>
-  
-);
-}
-
-
+  );
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -150,13 +156,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     padding: 20,
     paddingTop: 40,
-    marginBottom: -180,
+    marginBottom: -200,
     paddingEnd: 40,
     paddingStart: 40,
     alignItems: 'center',
   },
   welcomeText: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
@@ -190,9 +196,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  button:{
-    backgroundColor: '#F26E22'
-  },
   backButton: {
     alignItems: 'center',
     marginTop: 10,
@@ -202,11 +205,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     height: 50
   },
-  backButtonText: {
-    width: 45,
-    height:40,
+  backButtonSeta: {
     alignSelf: 'flex-start',
-    top: 10
+    width: 43,
+    height: 40
   },
   errorContainer: {
     width: '100%',
