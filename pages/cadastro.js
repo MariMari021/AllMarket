@@ -54,7 +54,7 @@ export function Cadastro( {navigation} ) {
 
 
   const handleBackPress = () => {
-    navigation.navigate('Inicio');
+    navigation.navigate('Home');
   };
 
   return (
@@ -117,11 +117,14 @@ export function Cadastro( {navigation} ) {
               <Image source={require('../assets/seta_esquerda.png')} style={styles.backButtonText} />
             </TouchableOpacity>
           </View>
+
+
         </ImageBackground>
       </View>
     </ScrollView>
-  );
-};
+  
+);
+}
 
 
 
@@ -186,6 +189,9 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  button:{
+    backgroundColor: '#F26E22'
   },
   backButton: {
     alignItems: 'center',

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, AsyncStorage, StyleSheet, ImageBackground, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from './UserContext';
 
-
 export function Login({ navigation }) {
-  const { setUsername, setEmail, setPassword } = useUser();
-  const [errorMessage, setErrorMessage] = useState('');
   const { setUserId, setIsAnonymous } = useUser();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
     try {
@@ -28,7 +29,6 @@ export function Login({ navigation }) {
     }
   };
 
-
   const navigateToCadastro = () => {
     navigation.navigate('Cadastro');
   };
@@ -44,24 +44,20 @@ export function Login({ navigation }) {
         <View style={styles.containerForm}>
           <Text style={styles.welcomeText}>Seja bem-vindo (a) ao</Text>
           <View style={styles.textWithImage}>
-
             <Image source={require('../assets/logo.png')} style={styles.icon} />
           </View>
           <TextInput
             style={styles.input}
-            placeholder="Nome de Usuário"
-            onChangeText={setUsername} // Use setUsername para atualizar o nome de usuário no contexto do usuário
-          />
-          <TextInput
-            style={styles.input}
             placeholder="Email"
-            onChangeText={setEmail} // Use setEmail para atualizar o email no contexto do usuário
+            value={email}
+            onChangeText={setEmail} // Atualiza o email no estado local
           />
           <TextInput
             style={styles.input}
             placeholder="Senha"
             secureTextEntry={true}
-            onChangeText={setPassword} // Use setPassword para atualizar a senha no contexto do usuário
+            value={password}
+            onChangeText={setPassword} // Atualiza a senha no estado local
           />
           {errorMessage ? (
             <Text style={styles.errorMessage}>{errorMessage}</Text>
@@ -81,7 +77,7 @@ export function Login({ navigation }) {
       </ImageBackground>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {

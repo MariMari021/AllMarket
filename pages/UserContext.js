@@ -24,13 +24,27 @@ export const UserProvider = ({ children }) => {
     }
   }, [userId]);
 
+  const saveProdutos = async (produtos) => {
+    try {
+      await AsyncStorage.setItem(`produtos_${userId}`, JSON.stringify(produtos));
+      setProdutosAdicionados(produtos);
+    } catch (error) {
+      console.error('Erro ao salvar produtos:', error);
+    }
+  };
+
   const logout = async () => {
-    setUserId(null);
-    setIsAnonymous(true);
-    // Limpar produtos adicionados ao fazer logout
-    setProdutosAdicionados([]);
-    // Salvar os produtos após limpar
-    await saveProdutos([], userId);
+    try {
+      console.log('Logging out from UserContext...');
+      await saveProdutos([]); // Save empty products list
+      setUserId(null);
+      setIsAnonymous(true);
+      setProdutosAdicionados([]); // Clear the products
+      await AsyncStorage.removeItem('anonymousId');
+      console.log('Logged out from UserContext successfully');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
 
   return (
@@ -41,3 +55,4 @@ export const UserProvider = ({ children }) => {
 };
 
 export const useUser = () => useContext(UserContext);
+

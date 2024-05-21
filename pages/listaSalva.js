@@ -2,44 +2,57 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Modal, ScrollView, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useListas } from './ListasContext';
+import { useUser } from './UserContext';
 
 export function ListaSalva({ route }) {
     const navigation = useNavigation();
-    const [listasSalvas, setListasSalvas] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedLista, setSelectedLista] = useState(null);
     const [modalExcluirVisible, setModalExcluirVisible] = useState(false);
+    const { listasSalvas, setListasSalvas, saveListas } = useListas();
+    const { userId, isAnonymous } = useUser();
+
 
     useEffect(() => {
         if (route.params?.listasSalvas) {
-            setListasSalvas(route.params.listasSalvas);
-            salvarListas(route.params.listasSalvas); // Salva as listas ao receber novas do parâmetro
+          setListasSalvas(route.params.listasSalvas);
+          saveListas(route.params.listasSalvas); // Salva as listas ao receber novas do parâmetro
         }
-    }, [route.params?.listasSalvas]);
+      }, [route.params?.listasSalvas]);
 
     useEffect(() => {
         carregarListasSalvas(); // Carrega as listas salvas ao iniciar o componente
     }, []);
 
-    const salvarListas = async (listas) => {
+    const salvarListas = async (listas, userId) => {
         try {
-            const jsonValue = JSON.stringify(listas);
-            await AsyncStorage.setItem('listasSalvas', jsonValue);
+          const jsonValue = JSON.stringify(listas);
+          await AsyncStorage.setItem(`@listasSalvas_${userId}`, jsonValue);
         } catch (error) {
-            console.error('Erro ao salvar as listas: ', error);
+          console.error('Erro ao salvar as listas: ', error);
         }
-    };
+      };
 
-    const carregarListasSalvas = async () => {
+      const carregarListasSalvas = async (userId) => {
         try {
-            const listasSalvasString = await AsyncStorage.getItem('listasSalvas');
-            if (listasSalvasString !== null) {
-                setListasSalvas(JSON.parse(listasSalvasString));
-            }
+          const listasSalvasString = await AsyncStorage.getItem(`@listasSalvas_${userId}`);
+          if (listasSalvasString !== null) {
+            setListasSalvas(JSON.parse(listasSalvasString));
+          }
         } catch (error) {
-            console.error('Erro ao carregar as listas salvas: ', error);
+          console.error('Erro ao carregar as listas salvas: ', error);
         }
-    };
+      };
+
+      useEffect(() => {
+        const fetchListas = async () => {
+          if (userId) {
+            await carregarListasSalvas(userId);
+          }
+        };
+        fetchListas();
+      }, [userId]);
 
     const handleListaPress = (lista) => {
         setSelectedLista(lista);
@@ -47,16 +60,16 @@ export function ListaSalva({ route }) {
     };
 
     const excluirLista = async () => {
-        const novasListas = listasSalvas.filter(lista => lista !== selectedLista);
+        const novasListas = listasSalvas.filter((lista) => lista !== selectedLista);
         setListasSalvas(novasListas);
         setModalVisible(false);
         setModalExcluirVisible(false);
-        await salvarListas(novasListas); // Salva as listas após excluir
+        await saveListas(novasListas); // Salva as listas após excluir
         if (route.params?.atualizarListas) {
-            route.params.atualizarListas(novasListas);
+          route.params.atualizarListas(novasListas);
         }
         navigation.navigate('ListaSalva', { listasSalvas: novasListas });
-    };
+      };
 
     return (
         <ScrollView style={styles.container}>

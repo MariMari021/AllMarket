@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useUser } from './UserContext';
+import { useListas } from './ListasContext';
 
 export function Perfil() {
+  const { userId, logout: userLogout } = useUser();
+  const { logout: listasLogout } = useListas();
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigation = useNavigation();
@@ -24,19 +28,21 @@ export function Perfil() {
     getUserData();
   }, []);
 
-  const [produtosAdicionados, setProdutosAdicionados] = useState([]);
-
-  const numProdutosAdicionados = produtosAdicionados.length;
-
   const handleLogout = async () => {
     try {
+      console.log('Calling handleLogout');
       await AsyncStorage.removeItem('userData');
       setUserData({ username: '', email: '', password: '' });
       setIsLoggedIn(false);
+      await listasLogout(userId); // Call logout from ListasContext with userId
+      await userLogout(); // Call logout from UserContext
+      console.log('Logout successful');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
   };
+
+
 
   return (
     <ScrollView style={{ height: 50 }}>
@@ -49,8 +55,7 @@ export function Perfil() {
           <View style={styles.header}>
             <Text style={styles.greeting}>
               Olá, 
-              <Text style={styles.username}>
-                {userData.username ? userData.username.split(' ')[0] : 'usuário'}
+              <Text style={styles.username}> {userData.username ? userData.username.split(' ')[0] : ' usuário'}
               </Text>
               <Image source={require('../assets/ola.png')} style={styles.ola} />
             </Text>
@@ -62,23 +67,23 @@ export function Perfil() {
             <>
               <View style={styles.cardContainer}>
                 <View style={styles.card}>
-                  <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text> adicionados</Text>
+                  <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text> {'\n'}na lista</Text>
                   <View style={styles.cardContent}>
                     <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
-                    <Text style={styles.cardNumber}>{numProdutosAdicionados}</Text>
+                    <Text style={styles.cardNumber}>{totalProdutos}</Text>
                   </View>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListaSalva')}>
                     <Text style={styles.buttonText}>Ver Mais</Text>
                     <Image source={require('../assets/setaLaranja.png')} style={styles.buttonIcon} />
                   </TouchableOpacity>
                 </View>
                 <View style={styles.card2}>
-                  <Text style={styles.cardTitle2}><Text style={styles.greenText}>Categorias</Text> adicionados</Text>
+                  <Text style={styles.cardTitle2}><Text style={styles.greenText}>Listas</Text> adicionadas</Text>
                   <View style={styles.cardContent}>
                     <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
-                    <Text style={styles.cardNumber2}>7</Text>
+                    <Text style={styles.cardNumber2}>{listasSalvas.length}</Text>
                   </View>
-                  <TouchableOpacity style={styles.button2}>
+                  <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('ListaSalva')}>
                     <Text style={styles.buttonText}>Ver Mais</Text>
                     <Image source={require('../assets/setaVerde.png')} style={styles.buttonIcon} />
                   </TouchableOpacity>
@@ -101,6 +106,10 @@ export function Perfil() {
               </View>
               <TouchableOpacity onPress={handleLogout}>
                 <Text style={styles.logoutButton}>Sair do login</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.tutorialButton} onPress={() => navigation.navigate('Tutorial')}>
+                <Text style={styles.tutorialButtonText}>Acesse o tutorial</Text>
+                <Image source={require('../assets/tutorialIcon.png')} style={styles.tutorialButtonIcon} />
               </TouchableOpacity>
             </>
           ) : (
@@ -132,8 +141,8 @@ const styles = StyleSheet.create({
   },
   iconeTopo: {
     marginTop: 40,
-    width: 35,
-    height: 35,
+    width: 40,
+    height: 40,
   },
   topBar: {
     width: '100%',
@@ -350,4 +359,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center'
   },
+  tutorialButton: {
+    backgroundColor: '#FF7300',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 13,
+    marginTop: 20,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    marginHorizontal: 16,
+  },
+  tutorialButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  tutorialButtonIcon: {
+    width: 20,
+    height: 20,
+  },
 });
+
