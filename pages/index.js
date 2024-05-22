@@ -54,7 +54,7 @@ export function Home({ route, navigation }) {
     }, [modalSalvarVisible]);
 
     const salvarLista = async () => {
-        const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === categoriaParaSalvar);
+        const produtosNaCategoria = produtosAdicionados.filter(produto => produto.categoria === selectedCategory);
 
         if (produtosNaCategoria.length === 0) {
             setModalNenhumProdutoVisible(true);
@@ -64,15 +64,14 @@ export function Home({ route, navigation }) {
 
         const novaLista = {
             nome: nomeDaLista,
-            categoria: categoriaParaSalvar,
+            categoria: selectedCategory,
             produtos: produtosNaCategoria,
             data: new Date().toISOString(),
         };
 
-        // Verifica se já existe uma lista com a mesma categoria e produtos (comparando todas as propriedades dos produtos)
         const listaExistente = listasSalvas.some(lista =>
             lista.nome === nomeDaLista &&
-            lista.categoria === categoriaParaSalvar &&
+            lista.categoria === selectedCategory &&
             lista.produtos.length === produtosNaCategoria.length &&
             lista.produtos.every((produto, index) => (
                 produto.nome === produtosNaCategoria[index].nome &&
@@ -80,7 +79,6 @@ export function Home({ route, navigation }) {
                 produto.preco === produtosNaCategoria[index].preco
             ))
         );
-
 
         if (listaExistente) {
             setModalListaExistenteVisible(true);
@@ -90,13 +88,14 @@ export function Home({ route, navigation }) {
 
         const novasListasSalvas = [...listasSalvas, novaLista];
         setListasSalvas(novasListasSalvas);
-        await AsyncStorage.setItem('@listasSalvas', JSON.stringify(novasListasSalvas));
+        await saveListas(novasListasSalvas);
         setModalSalvarVisible(false);
-        setModalListaSalvaSucessoVisible(true); // Exibe o modal de sucesso
+        setModalListaSalvaSucessoVisible(true);
 
-        // Navega para a tela "ListaSalva" e passa as listas salvas atualizadas como parâmetro
         navigation.navigate('ListaSalva', { listasSalvas: novasListasSalvas });
     };
+
+
 
 
     useFocusEffect(
@@ -133,6 +132,7 @@ export function Home({ route, navigation }) {
         }
     };
 
+
     useEffect(() => {
         const fetchListas = async () => {
             const listas = await loadListas();
@@ -144,6 +144,7 @@ export function Home({ route, navigation }) {
     useEffect(() => {
         saveListas(listasSalvas);
     }, [listasSalvas]);
+
 
 
 
@@ -208,7 +209,7 @@ export function Home({ route, navigation }) {
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 onScroll={(event) => handleScroll(event, category)}
-                scrollEventThrottle={16} // Ajuste conforme necessário
+                scrollEventThrottle={16}
             >
                 <View style={styles.cardContainer}>
                     <View style={styles.card}>
@@ -231,7 +232,7 @@ export function Home({ route, navigation }) {
                         .filter(produto => produto.categoria === selectedCategory)
                         .map((produto) => (
                             <CardAdicionado
-                                key={produto.id}  // Usando produto.id como chave única
+                                key={produto.id}
                                 id={produto.id}
                                 nome={produto.nome}
                                 quantidade={produto.quantidade}
@@ -246,6 +247,7 @@ export function Home({ route, navigation }) {
             </ScrollView>
         );
     };
+
 
 
     const getCategoryScrollView = (category) => {
@@ -314,20 +316,24 @@ export function Home({ route, navigation }) {
 
     const generateUniqueId = () => {
         const id = `id_${nextId}`;
-        setNextId(prevId => prevId + 1); // Incrementa nextId para a próxima chamada
+        setNextId(prevId => prevId + 1);
         return id;
     };
-      
-      
+
+
+    // Adicionar produto
     const adicionarProduto = async (produto) => {
         const produtoComCategoria = { ...produto, categoria: selectedCategory };
-        const id = generateUniqueId();  // Gerar ID único
-        produtoComCategoria.id = id;
-        setProdutosAdicionados([...produtosAdicionados, produtoComCategoria]);
-        await saveProdutos([...produtosAdicionados, produtoComCategoria]);
+        if (!produtoComCategoria.id) {
+            produtoComCategoria.id = generateUniqueId();
+        }
+        const novosProdutosAdicionados = produtosAdicionados.filter(p => p.id !== produtoComCategoria.id);
+        novosProdutosAdicionados.push(produtoComCategoria);
+        setProdutosAdicionados(novosProdutosAdicionados);
+        await saveProdutos(novosProdutosAdicionados);
     };
-    
-      
+
+
 
 
     useEffect(() => {
@@ -361,7 +367,6 @@ export function Home({ route, navigation }) {
     };
 
 
-
     const saveProdutos = async (produtos) => {
         try {
             const jsonValue = JSON.stringify(produtos);
@@ -385,13 +390,18 @@ export function Home({ route, navigation }) {
         const fetchData = async () => {
             const produtos = await loadProdutos();
             setProdutosAdicionados(produtos);
-
+    
             // Inicializando nextId com o maior ID atual + 1
-            const maxId = produtos.reduce((max, produto) => Math.max(max, produto.id), 0);
+            const maxId = produtos.reduce((max, produto) => {
+                const idNum = parseInt(produto.id.split('_')[1], 10); // Parsing to integer
+                return !isNaN(idNum) ? Math.max(max, idNum) : max;
+            }, 0);
             setNextId(maxId + 1);
         };
         fetchData();
     }, []);
+    
+
 
     useEffect(() => {
         console.log("Produtos carregados:", produtosAdicionados);
@@ -405,19 +415,20 @@ export function Home({ route, navigation }) {
 
 
 
-    const editarProduto = async (produto) => {
-        setNomeProduto(produto.nome);
-        setQuantidade(produto.quantidade);
-        setPreco(produto.preco);
-
-        const index = produtosAdicionados.findIndex(p => p.id === produto.id);
+    const editarProduto = async (produtoEditado) => {
+        const index = produtosAdicionados.findIndex(p => p.id === produtoEditado.id);
         if (index !== -1) {
             const novosProdutosAdicionados = [...produtosAdicionados];
-            novosProdutosAdicionados[index] = produto;
+            novosProdutosAdicionados[index] = { ...novosProdutosAdicionados[index], ...produtoEditado };
             setProdutosAdicionados(novosProdutosAdicionados);
             await saveProdutos(novosProdutosAdicionados);
+        } else {
+            console.error("Produto não encontrado para edição!");
         }
     };
+    
+
+
 
 
     useEffect(() => {
