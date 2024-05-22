@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Home } from './pages/index';
 import { Login } from './pages/login';
-import { Cadastro } from './pages/cadastro';
 import { Compras } from './pages/compras';
 import { Perfil } from './pages/perfil';
 import { Produtos } from './pages/produtos';
@@ -122,11 +121,10 @@ function MainTabNavigator() {
 
 function AppNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Inicio">
+    <Stack.Navigator initialRouteName="Login">
       <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="Produtos" component={Produtos} options={{ headerShown: false }} />
-      <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
       <Stack.Screen name="CardAdicionado" component={CardAdicionado} options={{ headerShown: false }} />
       <Stack.Screen name="Inicio" component={Inicio} options={{ headerShown: false }} />
       <Stack.Screen name="Tutorial" component={Tutorial} options={{ headerShown: false }} />

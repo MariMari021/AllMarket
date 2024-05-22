@@ -9,11 +9,11 @@ import * as SplashScreen from 'expo-splash-screen';
 
 
 export function Home({ route, navigation }) {
+    const [nextId, setNextId] = useState(0); // Inicialize nextId com 0
     const [modalNenhumProdutoVisible, setModalNenhumProdutoVisible] = useState(false);
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
     const [temCardAdicionado, setTemCardAdicionado] = useState(false);
     const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
-    const [nextId, setNextId] = useState(1); // Contador para gerar ids únicos
     const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
     const [preco, setPreco] = useState('');
     const [valorLimite, setValorLimite] = useState('');
@@ -231,14 +231,14 @@ export function Home({ route, navigation }) {
                         .filter(produto => produto.categoria === selectedCategory)
                         .map((produto) => (
                             <CardAdicionado
-                                key={produto.id}
+                                key={produto.id}  // Usando produto.id como chave única
                                 id={produto.id}
                                 nome={produto.nome}
                                 quantidade={produto.quantidade}
                                 preco={produto.preco}
                                 onPressRemover={removerProduto}
                                 onPressEditar={editarProduto}
-                                onPressAdicionar={onPressAdicionar} // Adicione essa linha
+                                onPressAdicionar={onPressAdicionar}
                                 navigation={navigation}
                             />
                         ))}
@@ -246,6 +246,7 @@ export function Home({ route, navigation }) {
             </ScrollView>
         );
     };
+
 
     const getCategoryScrollView = (category) => {
         switch (category) {
@@ -310,23 +311,23 @@ export function Home({ route, navigation }) {
     }, [modalVisible]);
 
 
+
+    const generateUniqueId = () => {
+        const id = `id_${nextId}`;
+        setNextId(prevId => prevId + 1); // Incrementa nextId para a próxima chamada
+        return id;
+    };
+      
+      
     const adicionarProduto = async (produto) => {
         const produtoComCategoria = { ...produto, categoria: selectedCategory };
-        const index = produtosAdicionados.findIndex(p => p.id === produto.id);
-        let novosProdutosAdicionados;
-
-        if (index !== -1) {
-            novosProdutosAdicionados = [...produtosAdicionados];
-            novosProdutosAdicionados[index] = produtoComCategoria;
-        } else {
-            produtoComCategoria.id = nextId;
-            novosProdutosAdicionados = [produtoComCategoria, ...produtosAdicionados];
-            setNextId(nextId + 1);
-        }
-
-        setProdutosAdicionados(novosProdutosAdicionados);
-        await saveProdutos(novosProdutosAdicionados);
+        const id = generateUniqueId();  // Gerar ID único
+        produtoComCategoria.id = id;
+        setProdutosAdicionados([...produtosAdicionados, produtoComCategoria]);
+        await saveProdutos([...produtosAdicionados, produtoComCategoria]);
     };
+    
+      
 
 
     useEffect(() => {
@@ -379,13 +380,28 @@ export function Home({ route, navigation }) {
         }
     };
 
+
     useEffect(() => {
         const fetchData = async () => {
             const produtos = await loadProdutos();
             setProdutosAdicionados(produtos);
+
+            // Inicializando nextId com o maior ID atual + 1
+            const maxId = produtos.reduce((max, produto) => Math.max(max, produto.id), 0);
+            setNextId(maxId + 1);
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        console.log("Produtos carregados:", produtosAdicionados);
+        const produtosUnicos = new Set(produtosAdicionados.map(p => p.id));
+        if (produtosUnicos.size !== produtosAdicionados.length) {
+            console.error("Produtos com IDs duplicados detectados!");
+        }
+    }, [produtosAdicionados]);
+
+
 
 
 

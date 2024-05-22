@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { v4 as uuidv4 } from 'uuid';
 
 const UserContext = createContext();
 
@@ -13,14 +12,24 @@ export const UserProvider = ({ children }) => {
     const initializeAnonymousUser = async () => {
       let anonymousId = await AsyncStorage.getItem('anonymousId');
       if (!anonymousId) {
-        anonymousId = uuidv4();
+        anonymousId = `anonymous-${Date.now()}`;
         await AsyncStorage.setItem('anonymousId', anonymousId);
       }
       setUserId(anonymousId);
     };
 
+    const initializeUser = async () => {
+      const savedEmail = await AsyncStorage.getItem('user_email');
+      if (savedEmail) {
+        setUserId(savedEmail);
+        setIsAnonymous(false);
+      } else {
+        initializeAnonymousUser();
+      }
+    };
+
     if (!userId) {
-      initializeAnonymousUser();
+      initializeUser();
     }
   }, [userId]);
 
@@ -41,6 +50,7 @@ export const UserProvider = ({ children }) => {
       setIsAnonymous(true);
       setProdutosAdicionados([]); // Clear the products
       await AsyncStorage.removeItem('anonymousId');
+      await AsyncStorage.removeItem('user_email');
       console.log('Logged out from UserContext successfully');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
@@ -55,4 +65,3 @@ export const UserProvider = ({ children }) => {
 };
 
 export const useUser = () => useContext(UserContext);
-

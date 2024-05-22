@@ -3,18 +3,24 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView 
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useListas } from './ListasContext'; // Importe o contexto das listas
+import { useUser } from './UserContext'; // Importe o contexto de usuário
 
 export function Perfil({ valorLimite, categoriasComTotais }) {
   const navigation = useNavigation();
   const { listasSalvas, totalProdutos } = useListas(); // Use o contexto das listas
+  const { setUserId, setIsAnonymous } = useUser(); // Use o contexto de usuário
+
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
+
   useEffect(() => {
     const getUserData = async () => {
       try {
-        // Recuperando os dados salvos do AsyncStorage
-        const storedUserData = await AsyncStorage.getItem('userData');
-        if (storedUserData) {
-          setUserData(JSON.parse(storedUserData));
+        const savedEmail = await AsyncStorage.getItem('user_email');
+        if (savedEmail) {
+          const storedUserData = await AsyncStorage.getItem(savedEmail);
+          if (storedUserData) {
+            setUserData(JSON.parse(storedUserData));
+          }
         }
       } catch (error) {
         console.error('Erro ao recuperar os dados do cadastro:', error);
@@ -29,10 +35,21 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
 
   const numProdutosAdicionados = produtosAdicionados.length; // Calcula o número de produtos adicionados
 
-
   const firstName = userData.username.split(' ')[0];
+
   const handleNavigateToCompras = () => {
     navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('user_email');
+      setUserId(null);
+      setIsAnonymous(true);
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
   };
 
   return (
@@ -105,17 +122,17 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
             </TouchableOpacity>
           </View>
           <View style={styles.verTutorial}>
-            <TouchableOpacity style={styles.botaoTutorial} onPress={() => navigation.navigate('Cadastro')}>
-              <Text style={styles.tutorialTexto}>Fazer cadastro</Text>
+            <TouchableOpacity style={styles.botaoTutorial} onPress={handleLogout}>
+              <Text style={styles.tutorialTexto}>Fazer logout</Text>
               <Image source={require('../assets/setaDireita.png')} style={styles.setaVerde} />
             </TouchableOpacity>
           </View>
         </View>
-
       </View>
     </ScrollView>
   );
 }
+
 
 
 const styles = StyleSheet.create({

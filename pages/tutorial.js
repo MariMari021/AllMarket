@@ -58,7 +58,8 @@ export function Tutorial({navigation}) {
   }
 
   return (
-    <ScrollView style={{ height: 50 }}>
+  
+    <ScrollView style={{ height: 50, backgroundColor:'#0B8C38' }}>
       <View style={styles.container}>
         <View style={styles.conteudo}>
           <View style={styles.header}>
@@ -110,7 +111,6 @@ const styles = StyleSheet.create({
   },
   botao: {
     backgroundColor: "#0B8C38",
-    height: '70%',
     width: "100%",
     padding: 40,
     paddingEnd: 50,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   conteudo: {
     backgroundColor: "#fff",
     width: '100%',
-    height: 710,
+    height: 730,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
