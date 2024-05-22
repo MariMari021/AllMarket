@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useListas } from './ListasContext'; // Importe o contexto das listas
 
-export function Perfil() {
+export function Perfil({ valorLimite, categoriasComTotais }) {
   const navigation = useNavigation();
   const { listasSalvas, totalProdutos } = useListas(); // Use o contexto das listas
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
@@ -36,69 +36,84 @@ export function Perfil() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header2}>
-        <View style={styles.headerInicio}>
-          <Image
-            style={styles.profile}
-            source={require('../assets/profile.png')}
-          />
-          <TouchableOpacity onPress={handleNavigateToCompras}>
+    <ScrollView>
+      <View style={styles.container}>
+        <View style={styles.header2}>
+          <View style={styles.headerInicio}>
             <Image
-              style={styles.sacola}
-              source={require('../assets/sacola.png')}
+              style={styles.profile}
+              source={require('../assets/profile.png')}
             />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.header}>
-          <Text style={styles.greeting}>Olá, <Text style={styles.userName}>{firstName}</Text> <Image source={require('../assets/ola.png')} style={styles.ola} /> </Text>
-          <Text style={styles.subtitle}>Consulte os seus dados.</Text>
-        </View>
-      </View>
-      <View style={styles.tudo}>
-        <View style={styles.cardContainer}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text>{'\n'}na lista</Text>
-            <View style={styles.cardContent}>
-              <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
-              <Text style={styles.cardNumber}>{totalProdutos}</Text>
-            </View>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListaSalva')}>
-              <Text style={styles.buttonText}>Ver Mais</Text>
-              <Image source={require('../assets/setaLaranja.png')} style={styles.buttonIcon} />
+            <TouchableOpacity onPress={handleNavigateToCompras}>
+              <Image
+                style={styles.sacola}
+                source={require('../assets/sacola.png')}
+              />
             </TouchableOpacity>
           </View>
-          <View style={styles.card2}>
-            <Text style={styles.cardTitle2}><Text style={styles.greenText}>Listas</Text> adicionadas</Text>
-            <View style={styles.cardContent}>
-              <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
-              <Text style={styles.cardNumber2}>{numListasSalvas}</Text>
+
+          <View style={styles.header}>
+            <Text style={styles.greeting}>Olá, <Text style={styles.userName}>{firstName}</Text> <Image source={require('../assets/ola.png')} style={styles.ola} /> </Text>
+            <Text style={styles.subtitle}>Consulte os seus dados.</Text>
+          </View>
+        </View>
+        <View style={styles.tudo}>
+
+          <View style={styles.cardContainer}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text>{'\n'}na lista</Text>
+              <View style={styles.cardContent}>
+                <Image source={require('../assets/sacolaBranca.png')} style={styles.cardIcon} />
+                <Text style={styles.cardNumber}>{totalProdutos}</Text>
+              </View>
+              <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ListaSalva')}>
+                <Text style={styles.buttonText}>Ver Mais</Text>
+                <Image source={require('../assets/playIcone.png')} style={styles.buttonIcon} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('ListaSalva')}>
-              <Text style={styles.buttonText}>Ver Mais</Text>
-              <Image source={require('../assets/setaVerde.png')} style={styles.buttonIcon} />
+            <View style={styles.card2}>
+              <Text style={styles.cardTitle2}><Text style={styles.greenText}>Listas</Text> adicionadas</Text>
+              <View style={styles.cardContent}>
+                <Image source={require('../assets/categoriaIcon.png')} style={styles.cardIcon} />
+                <Text style={styles.cardNumber2}>{numListasSalvas}</Text>
+              </View>
+              <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate('ListaSalva')}>
+                <Text style={styles.buttonText}>Ver Mais</Text>
+                <Image source={require('../assets/playIcone2.png')} style={styles.buttonIcon} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.sectionTitleContainer}>
+            <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
+          </View>
+          <View style={styles.inputContainer}>
+            <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
+          </View>
+          <View style={styles.inputContainer}>
+            <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="Email" value={userData.email} />
+          </View>
+          <View style={styles.inputContainerCadastro}>
+            <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
+            <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
+          </View>
+          <View style={styles.verCadastro}>
+            <TouchableOpacity style={styles.botaoTutorial} onPress={() => navigation.navigate('Tutorial')}>
+              <Text style={styles.tutorialTexto}>Ver Tutorial</Text>
+              <Image source={require('../assets/setaDireita.png')} style={styles.setaVerde} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.verTutorial}>
+            <TouchableOpacity style={styles.botaoTutorial} onPress={() => navigation.navigate('Cadastro')}>
+              <Text style={styles.tutorialTexto}>Fazer cadastro</Text>
+              <Image source={require('../assets/setaDireita.png')} style={styles.setaVerde} />
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.sectionTitleContainer}>
-          <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
-        </View>
-        <View style={styles.inputContainer}>
-          <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
-        </View>
-        <View style={styles.inputContainer}>
-          <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Email" value={userData.email} />
-        </View>
-        <View style={styles.inputContainer}>
-          <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
-        </View>
-      </View>
 
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -144,15 +159,16 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
     color: '#5F5F5F',
-    top: 20
+    top: 10
   },
   userName: {
     color: '#007B3A',
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#666',
-    top: 20
+    top: 13,
+    paddingBottom: 20
   },
   tudo: {
     padding: 20
@@ -195,7 +211,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   yellowText: {
-    color: '#F26E22',
+    color: "#F7AB38",
     fontWeight: 'bold',
     fontSize: 20,
   },
@@ -248,7 +264,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonIcon: {
-    width: 33,
+    width: 30,
     height: 30,
   },
   sectionTitleContainer: {
@@ -277,6 +293,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginTop: 20,
   },
+  inputContainerCadastro: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 17,
+    marginBottom: 33,
+    marginHorizontal: 16,
+    paddingHorizontal: 8,
+    marginTop: 20,
+  },
   input: {
     height: 50,
     flex: 1,
@@ -287,4 +314,34 @@ const styles = StyleSheet.create({
     height: 33,
     marginRight: 8,
   },
+  verTutorial: {
+    paddingStart: 16,
+    paddingEnd: 16,
+    paddingTop:20,
+  },
+  verCadastro: {
+    paddingStart: 16,
+    paddingEnd: 16,
+  },
+  botaoTutorial: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.36)',
+    height: 47,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingEnd: 38,
+    paddingStart: 38,
+    backgroundColor: 'white'
+  },
+  setaVerde: {
+    width: 34,
+    height: 34
+  },
+  tutorialTexto: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#F26E22'
+  }
 });

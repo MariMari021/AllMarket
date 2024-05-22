@@ -61,7 +61,7 @@ export function Compras({ navigation }) {
     return null;
   }
   return (
-    <SafeAreaView style={{ backgroundColor: '#fff' }}>
+    <SafeAreaView style={{ backgroundColor: '#F9F9F9' }}>
       <ScrollView style={{ height: '100%' }}>
         <StatusBar
           barStyle="light-content"
@@ -70,10 +70,12 @@ export function Compras({ navigation }) {
         <View style={styles.centralizarConteudo}>
           <View style={styles.header}>
             <View style={styles.headerInicio}>
-              <Image
-                style={styles.profile}
-                source={require('../assets/profile.png')}
-              />
+              <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
+                <Image
+                  style={styles.profile}
+                  source={require('../assets/profile.png')}
+                />
+              </TouchableOpacity>
               <TouchableOpacity onPress={() => navigation.navigate('Main')}>
                 <Image
                   style={styles.sacola}
@@ -87,112 +89,112 @@ export function Compras({ navigation }) {
           </View>
 
 
-        <View style={styles.cordefundo}>
-          {nenhumValorDefinido ? (
-            <View style={styles.mensagemContainer}>
-              <Text style={styles.mensagem}>
-                <Text style={styles.nenhumText}>Nenhum valor</Text>
-                <Text style={styles.valorText}> ou {'\n'}categoria definidos.</Text>
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                <Image
-                  style={styles.mais}
-                  source={require('../assets/maisIcone.png')}
-                />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <>
-              <View style={styles.precoMax}>
-                <Image
-                  style={styles.dinheiro}
-                  source={require('../assets/imgValor.png')}
-                />
-                <View style={styles.input}>
-                  {ultimoValorLimite ? (
-                    <Text style={styles.valorLimite}>Valor limite: {ultimoValorLimite}</Text>
+          <View style={styles.cordefundo}>
+            {nenhumValorDefinido ? (
+              <View style={styles.mensagemContainer}>
+                <Text style={styles.mensagem}>
+                  <Text style={styles.nenhumText}>Nenhum valor</Text>
+                  <Text style={styles.valorText}> ou {'\n'}categoria definidos.</Text>
+                </Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                  <Image
+                    style={styles.mais}
+                    source={require('../assets/maisIcone.png')}
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <>
+                <View style={styles.precoMax}>
+                  <Image
+                    style={styles.dinheiro}
+                    source={require('../assets/imgValor.png')}
+                  />
+                  <View style={styles.input}>
+                    {ultimoValorLimite ? (
+                      <Text style={styles.valorLimite}>Valor limite: {ultimoValorLimite}</Text>
+                    ) : (
+                      <Text style={styles.valorSemLimite}>Limite não definido</Text>
+                    )}
+                  </View>
+                </View>
+
+                <View>
+                  <Text style={styles.categorias}>Categorias</Text>
+                  {categoriasComTotais.length > 0 ? (
+                    categoriasComTotais.map(({ categoria, total }, index) => (
+                      <View key={index} style={styles.container}>
+                        <View style={styles.destaqueContainer}>
+                          <View style={styles.labelDestaque}>
+                            <Text style={styles.categoriaLabel}>{categoria}</Text>
+                          </View>
+                        </View>
+                        <View style={styles.containerValorTotal}>
+                          <View style={styles.valorTotal}>
+                            <View style={styles.resultado}>
+                              <Image
+                                source={require('../assets/dinheiro2.png')}
+                                style={styles.dinheiroBorda}
+                              />
+                              <Text style={styles.valorTotalPreco}>R$</Text>
+                            </View>
+                            <Text style={styles.valorTotalPreco}>{total}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    ))
                   ) : (
-                    <Text style={styles.valorSemLimite}>Limite não definido</Text>
+                    <View>
+                    </View>
                   )}
                 </View>
-              </View>
 
-              <View>
-                <Text style={styles.categorias}>Categorias</Text>
-                {categoriasComTotais.length > 0 ? (
-                  categoriasComTotais.map(({ categoria, total }, index) => (
-                    <View key={index} style={styles.container}>
-                      <View style={styles.destaqueContainer}>
-                        <View style={styles.labelDestaque}>
-                          <Text style={styles.categoriaLabel}>{categoria}</Text>
-                        </View>
-                      </View>
+                <View>
+                  {categoriaMenorValor ? (
+                    <View>
+                      <Text style={styles.caixaTextoForaBarata}>Categoria + barata</Text>
                       <View style={styles.containerValorTotal}>
-                        <View style={styles.valorTotal}>
+                        <View style={styles.valorTotalBarato}>
                           <View style={styles.resultado}>
                             <Image
-                              source={require('../assets/dinheiro2.png')}
-                              style={styles.dinheiroBorda}
+                              source={require('../assets/dinheiro.png')}
+                              style={styles.dinheiro}
                             />
-                            <Text style={styles.valorTotalPreco}>R$</Text>
+                            <Text style={styles.valorTotalTexto}>{categoriaMenorValor.categoria}</Text>
                           </View>
-                          <Text style={styles.valorTotalPreco}>{total}</Text>
+                          <Text style={styles.valorTotalPrecoBarato}>R${categoriaMenorValor.total}</Text>
                         </View>
                       </View>
                     </View>
-                  ))
-                ) : (
-                  <View>
-                  </View>
-                )}
-              </View>
-
-              <View>
-                {categoriaMenorValor ? (
-                  <View>
-                    <Text style={styles.caixaTextoForaBarata}>Categoria + barata</Text>
-                    <View style={styles.containerValorTotal}>
-                      <View style={styles.valorTotalBarato}>
-                        <View style={styles.resultado}>
-                          <Image
-                            source={require('../assets/dinheiro.png')}
-                            style={styles.dinheiro}
-                          />
-                          <Text style={styles.valorTotalTexto}>{categoriaMenorValor.categoria}</Text>
-                        </View>
-                        <Text style={styles.valorTotalPrecoBarato}>R${categoriaMenorValor.total}</Text>
+                  ) : (
+                    <View style={styles.containerSpacing}>
+                      <View style={styles.semCategoria}>
+                        <Text style={styles.spacing}>Nenhuma categoria com produto adicionado.</Text>
                       </View>
                     </View>
-                  </View>
-                ) : (
-                  <View style={styles.containerSpacing}>
-                    <View style={styles.semCategoria}>
-                      <Text style={styles.spacing}>Nenhuma categoria com produto adicionado.</Text>
-                    </View>
-                  </View>
-                )}
-                {categoriaMaiorValor ? (
-                  <View>
-                    <Text style={styles.caixaTextoFora}>Categoria + cara</Text>
-                    <View style={styles.containerValorTotal}>
-                      <View style={styles.valorTotalCaro}>
-                        <View style={styles.resultado}>
-                          <Image
-                            source={require('../assets/dinheiro.png')}
-                            style={styles.dinheiro}
-                          />
-                          <Text style={styles.valorTotalTexto}>{categoriaMaiorValor.categoria}</Text>
+                  )}
+                  {categoriaMaiorValor ? (
+                    <View>
+                      <Text style={styles.caixaTextoFora}>Categoria + cara</Text>
+                      <View style={styles.containerValorTotal}>
+                        <View style={styles.valorTotalCaro}>
+                          <View style={styles.resultado}>
+                            <Image
+                              source={require('../assets/dinheiro.png')}
+                              style={styles.dinheiro}
+                            />
+                            <Text style={styles.valorTotalTexto}>{categoriaMaiorValor.categoria}</Text>
+                          </View>
+                          <Text style={styles.valorTotalPrecoBarato}>R${categoriaMaiorValor.total}</Text>
                         </View>
-                        <Text style={styles.valorTotalPrecoBarato}>R${categoriaMaiorValor.total}</Text>
                       </View>
                     </View>
-                  </View>
-                ) : (
-                  <Text></Text>
-                )}
-              </View>
-            </>
-          )}
+                  ) : (
+                    <Text></Text>
+                  )}
+                </View>
+              </>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0, 0, 0, 0.16)'
   },
-  cordefundo:{
+  cordefundo: {
     backgroundColor: '#f9f9f9',
   },
   headerInicio: {
@@ -401,23 +403,23 @@ const styles = StyleSheet.create({
   },
   semCategoria: {
     height: 67,
-    paddingEnd:15,
-    paddingStart:17,
+    paddingEnd: 15,
+    paddingStart: 17,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: '#7DBF4E',
   },
-  containerSpacing:{
-    paddingTop:15,
-    paddingStart:40,
-    paddingEnd:40
+  containerSpacing: {
+    paddingTop: 15,
+    paddingStart: 40,
+    paddingEnd: 40
   },
-  spacing:{
-    fontFamily:'Inter',
-    fontWeight:'600',
-    color:"white",
-    fontSize:17
+  spacing: {
+    fontFamily: 'Inter',
+    fontWeight: '600',
+    color: "white",
+    fontSize: 17
   }
 
 })

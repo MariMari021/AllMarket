@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CardAdicionado } from './cardAdicionado'; // Importe o componente CardAdicionado, se necessário
 import { useFonts } from 'expo-font';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 import * as SplashScreen from 'expo-splash-screen';
 
 
@@ -35,6 +36,8 @@ export function Home({ route, navigation }) {
     const [modalListaExistenteVisible, setModalListaExistenteVisible] = useState(false);
     const [modalListaSalvaSucessoVisible, setModalListaSalvaSucessoVisible] = useState(false);
 
+
+
     useFocusEffect(
         React.useCallback(() => {
             if (route.params?.listasSalvas) {
@@ -65,7 +68,7 @@ export function Home({ route, navigation }) {
             produtos: produtosNaCategoria,
             data: new Date().toISOString(),
         };
-      
+
         // Verifica se já existe uma lista com a mesma categoria e produtos (comparando todas as propriedades dos produtos)
         const listaExistente = listasSalvas.some(lista =>
             lista.nome === nomeDaLista &&
@@ -466,10 +469,12 @@ export function Home({ route, navigation }) {
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={styles.headerInicio}>
-                        <Image
-                            style={styles.profile}
-                            source={require('../assets/profile.png')}
-                        />
+                        <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
+                            <Image
+                                style={styles.profile}
+                                source={require('../assets/profile.png')}
+                            />
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={handleNavigateToCompras}>
                             <Image
                                 style={styles.sacola}
@@ -822,14 +827,20 @@ export function Home({ route, navigation }) {
                         </Text>
                     </View>
                 </View>
-                <View style={styles.mensagemFinal}>
+                <View style={styles.container}>
                     {limiteUltrapassado && (
-                        <Text style={styles.avisoLimite}>O valor total dos produtos excede o limite especificado.</Text>
-                    )}
-                    {valorLimite && totalPreco > valorLimite && (
-                        <Text style={styles.diferençaTotal}>
-                            Diferença: R$ {limiteUltrapassado ? (totalPreco - valorLimite).toFixed(2) : (valorLimite - totalPreco).toFixed(2)}
-                        </Text>
+                        <Animatable.View
+                            animation="slideInUp"
+                            duration={500}
+                            style={styles.mensagemFinal}
+                        >
+                            <Text style={styles.avisoLimite}>
+                                Cuidado!
+                            </Text>
+                            <Text style={styles.fimTexto}>
+                                <Text style={styles.valorTotalLimite}>Valor total</Text> dos produtos excede <Text style={styles.diferencaTotal}>R$ {(totalPreco - valorLimite).toFixed(2)}</Text> o <Text style={styles.limiteEspecificado}>limite especificado.</Text>
+                            </Text>
+                        </Animatable.View>
                     )}
                 </View>
 
@@ -1393,4 +1404,47 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    mensagemFinal: {
+        backgroundColor: "#0B8C38",
+        padding: 10,
+        borderRadius: 15,
+        marginStart: 40,
+        marginEnd: 40,
+        marginBottom: 25,
+        elevation: 3,
+        paddingStart: 23,
+        paddingTop: 23,
+        paddingBottom: 25
+    },
+    avisoLimite: {
+        color: 'white',
+        fontWeight: '500',
+        fontSize: 22,
+        width: '100%'
+    },
+    valorTotalLimite: {
+        borderRadius: 4,
+        padding: 5,
+        color: '#ffc107',
+        fontFamily: 'Inter',
+        fontWeight: '800',
+        fontSize: 20,
+
+    },
+    limiteEspecificado: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    diferencaTotal: {
+        marginTop: 10,
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 20,
+    },
+    fimTexto: {
+        fontFamily: 'Inter',
+        color: 'white',
+        fontSize: 18
+    }
+
 });

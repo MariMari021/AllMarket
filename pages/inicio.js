@@ -7,7 +7,7 @@ export function Inicio({ navigation }) {
     };
 
     const handleBackPress = () => {
-        navigation.navigate('Main'); // Navega de volta para a página Index
+        navigation.navigate('Tutorial'); // Navega de volta para a página Index
     };
 
     return (
@@ -26,7 +26,7 @@ export function Inicio({ navigation }) {
                         <Image source={require('../assets/inicio.gif')} style={styles.imgPrincipal} />
                     </View>
                     <TouchableOpacity style={styles.button} onPress={handleLoginPress}>
-                        <Text style={styles.buttonText}>Fazer Login</Text>
+                        <Text style={styles.buttonText}>Cadastre-se!</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         paddingBottom: '22%',
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
+        height:'83%'
     },
     logo: {
         width: 155,
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginTop: 80,
-        marginBottom: '37%',
+        marginBottom: '25%',
     },
     orangeText: {
         color: '#F26E22',
@@ -106,9 +107,10 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         width: 310,
         height: 50,
-        marginTop: 34,
+        marginTop: 43,
         justifyContent: 'center',
         alignItems: 'center',
+        
     },
     buttonText: {
         color: '#F26E22',

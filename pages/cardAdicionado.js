@@ -120,12 +120,12 @@ const styles = StyleSheet.create({
         fontSize: 19
     },
     botaoMaisProduto: {
-        width: 36,
-        height: 22
+        width: 38.2,
+        height: 23
     },
     botaoMenosProduto: {
-        width: 37,
-        height: 22
+        width: 38.3,
+        height: 23
     },
     valorProduto: {
         paddingStart: "12%",

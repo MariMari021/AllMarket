@@ -67,10 +67,12 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
         <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.headerInicio}>
-                    <Image
-                        style={styles.profile}
-                        source={require('../assets/profile.png')}
-                    />
+                    <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
+                        <Image
+                            style={styles.profile}
+                            source={require('../assets/profile.png')}
+                        />
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={handleNavigateToCompras}>
                         <Image
                             style={styles.sacola}
@@ -139,7 +141,7 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
                                     </View>
                                     <Text style={styles.produtoQuantidade}>Quantidade: {produto.quantidade}</Text>
                                     <Text style={styles.produtoPreco}>Preço unitário: R$ {produto.preco.toFixed(2)}</Text>
-                                    <Text style={styles.produtoTotal}>Preço Total: R$ {(produto.quantidade * produto.preco).toFixed(2)}</Text>
+                                    <Text style={styles.produtoPreco}>Preço Total: R$ {(produto.quantidade * produto.preco).toFixed(2)}</Text>
                                 </View>
                             ))}
                         </ScrollView>
@@ -394,7 +396,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical:'35%'
+        paddingVertical: '35%'
     },
     emptyListText: {
         fontWeight: 'bold',
@@ -441,5 +443,5 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 17,
         color: '#666',
-      }
+    }
 });

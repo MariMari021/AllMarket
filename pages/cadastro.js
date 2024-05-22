@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, ImageBackground, View, TextInput, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView } from 'react-native-web';
+import * as Animatable from 'react-native-animatable';
 
 export function Cadastro() {
   const [username, setUsername] = useState('');
@@ -29,7 +29,7 @@ export function Cadastro() {
 
   const handleEmailChange = (text) => {
     setEmail(text);
-  
+
     if (!text.includes('@')) {
       setErrorMessage('Por favor, insira um email válido.');
     } else {
@@ -52,11 +52,11 @@ export function Cadastro() {
       setErrorMessage('Por favor, preencha todos os campos corretamente.');
       return;
     }
-  
+
     try {
       // Salvando os dados do cadastro no AsyncStorage
       await AsyncStorage.setItem('userData', JSON.stringify({ username, email, password }));
-      navigation.navigate('Main');
+      navigation.navigate('Tutorial');
       setErrorMessage('');
     } catch (error) {
       console.error('Erro ao salvar os dados do cadastro:', error);
@@ -68,66 +68,72 @@ export function Cadastro() {
   };
 
   return (
-   
+
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <ImageBackground
           source={require('../assets/cadastro.png')}
           style={styles.backgroundImage}
         >
-          <View style={styles.formContainer}>
-            <Text style={styles.welcomeText}>Cadastre-se agora para {'\n'}uma melhor experiência!</Text>
-            <Image source={require('../assets/logo.png')} style={styles.image} />
-            <TextInput
-              style={styles.input}
-              placeholder="Nome de Usuário"
-              value={username}
-              onChangeText={handleUsernameChange}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Data de Nascimento (dd/mm/aaaa)"
-              value={birthday}
-              onChangeText={handleBirthdayChange}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Telefone"
-              value={phone}
-              onChangeText={handlePhoneChange}
-              keyboardType="numeric"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={handleEmailChange}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              secureTextEntry={true}
-              value={password}
-              onChangeText={handlePasswordChange}
-            />
-            {errorMessage ? (
-              <View style={styles.errorContainer}>
-                <Text style={styles.errorMessage}>{errorMessage}</Text>
-              </View>
-            ) : null}
-            <TouchableOpacity
-              style={styles.registerButton}
-              onPress={handleCadastro}
-            >
-              <Text style={styles.buttonText}>Cadastrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={handleBackPress}
-            >
-              <Image source={require('../assets/seta_esquerda.png')} style={styles.backButtonSeta} />
-            </TouchableOpacity>
-          </View>
+          <Animatable.View
+            animation="slideInUp"
+            duration={700}
+            style={styles.mensagemFinal}
+          >
+            <View style={styles.formContainer}>
+              <Text style={styles.welcomeText}>Cadastre-se agora para {'\n'}uma melhor experiência!</Text>
+              <Image source={require('../assets/logo.png')} style={styles.image} />
+              <TextInput
+                style={styles.input}
+                placeholder="Nome de Usuário"
+                value={username}
+                onChangeText={handleUsernameChange}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Data de Nascimento (dd/mm/aaaa)"
+                value={birthday}
+                onChangeText={handleBirthdayChange}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Telefone"
+                value={phone}
+                onChangeText={handlePhoneChange}
+                keyboardType="numeric"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={handleEmailChange}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                secureTextEntry={true}
+                value={password}
+                onChangeText={handlePasswordChange}
+              />
+              {errorMessage ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorMessage}>{errorMessage}</Text>
+                </View>
+              ) : null}
+              <TouchableOpacity
+                style={styles.registerButton}
+                onPress={handleCadastro}
+              >
+                <Text style={styles.buttonText}>Cadastrar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={handleBackPress}
+              >
+                <Image source={require('../assets/seta_esquerda.png')} style={styles.backButtonSeta} />
+              </TouchableOpacity>
+            </View>
+          </Animatable.View>
         </ImageBackground>
       </View>
     </ScrollView>
@@ -203,12 +209,13 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: '100%',
     alignSelf: 'flex-start',
-    height: 50
+    height: 50,
+    paddingBottom: 70
   },
   backButtonSeta: {
     alignSelf: 'flex-start',
     width: 43,
-    height: 40
+    height: 40,
   },
   errorContainer: {
     width: '100%',

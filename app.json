@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "AllMarket",
-    "slug": "AllMarket",
+    "name": "Oba",
+    "slug": "Oba",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logoIcon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -21,13 +21,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.maricota.Oba"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "de23a11d-3ee9-4c1b-918e-4058501df0c5"
+      }
+    }
   }
 }

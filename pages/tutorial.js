@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   media: {
     borderRadius: 15,
     width: '75%',
-    height: '86%',
+    height: '89%',
   },
   pagination: {
     flexDirection: 'row',

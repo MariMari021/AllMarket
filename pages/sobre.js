@@ -59,7 +59,7 @@ export function Sobre({ navigation, route, valorLimite, categoriasComTotais }) {
     };
 
     return (
-        <SafeAreaView style={{ backgroundColor: '#fff' }}>
+        <SafeAreaView style={{ backgroundColor: '#F9F9F9' }}>
             <ScrollView style={{ height: '100%' }}>
                 <StatusBar
                     barStyle="light-content"
@@ -68,10 +68,12 @@ export function Sobre({ navigation, route, valorLimite, categoriasComTotais }) {
                 <View style={styles.centralizarConteudo}>
                     <View style={styles.header}>
                         <View style={styles.headerInicio}>
-                            <Image
-                                style={styles.profile}
-                                source={require('../assets/profile.png')}
-                            />
+                            <TouchableOpacity onPress={() => navigation.navigate('Perfil')}>
+                                <Image
+                                    style={styles.profile}
+                                    source={require('../assets/profile.png')}
+                                />
+                            </TouchableOpacity>
                             <TouchableOpacity onPress={handleNavigateToCompras}>
                                 <Image
                                     style={styles.sacola}
@@ -249,7 +251,6 @@ const styles = StyleSheet.create({
         paddingStart: 23,
         paddingEnd: 23,
         padding: 15,
-        width: 325,
         height: 145,
         backgroundColor: '#0B8C38',
         borderRadius: 20,
