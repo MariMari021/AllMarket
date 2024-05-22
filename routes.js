@@ -121,7 +121,7 @@ function MainTabNavigator() {
 
 function AppNavigator() {
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator initialRouteName="Inicio">
       <Stack.Screen name="Main" component={MainTabNavigator} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
       <Stack.Screen name="Produtos" component={Produtos} options={{ headerShown: false }} />

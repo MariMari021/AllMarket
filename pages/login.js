@@ -21,12 +21,12 @@ export function Login() {
       try {
         const keys = await AsyncStorage.getAllKeys();
         const users = await AsyncStorage.multiGet(keys);
-  
+
         console.log('Usuários cadastrados:');
         users.forEach(([key, value]) => {
           console.log(key + ': ' + value);
         });
-  
+
         const savedEmail = await AsyncStorage.getItem('user_email');
         if (savedEmail) {
           setIsAnonymous(false);
@@ -38,7 +38,7 @@ export function Login() {
     };
     checkUserLoggedIn();
   }, []);
-  
+
 
   const handleEmailChange = (text) => {
     setEmail(text);
@@ -108,11 +108,15 @@ export function Login() {
       }
     }
   };
-  
+
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
     setErrorMessage('');
+  };
+
+  const handleBackPress = () => {
+    navigation.navigate('Tutorial'); // Navega de volta para a página Index
   };
 
   return (
@@ -120,7 +124,7 @@ export function Login() {
       <View style={styles.container}>
         <ImageBackground
           source={isLogin ? require('../assets/login.png') : require('../assets/cadastro.png')}
-          style={styles.backgroundImage}
+          style={isLogin ? styles.backgroundImage : styles.backgroundImage2}
         >
           <Animatable.View
             animation="slideInUp"
@@ -188,8 +192,10 @@ export function Login() {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.backButton}
+                style={styles.backButton} onPress={handleBackPress}
               >
+                <Text style={styles.backText}>Pular</Text>
+                <Image source={require('../assets/setaDireita.png')} style={styles.backIcon} />
               </TouchableOpacity>
             </View>
           </Animatable.View>
@@ -209,7 +215,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     width: '100%',
-    height: '40%',
+    height: '53%',
     justifyContent: 'flex-end',
   },
 
@@ -217,10 +223,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    paddingVertical: 40,
+    // paddingVertical: 40,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginBottom: 160,
+    // marginBottom: 160,
     paddingEnd: 40,
     paddingStart: 40
   },
@@ -293,12 +299,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  backgroundImage: {
+  backgroundImage2: {
     flex: 1,
     width: '100%',
-    height: '35%',
+    height: '46%',
     resizeMode: 'cover',
     justifyContent: 'center',
+    paddingTop: 270
   },
   formContainer: {
     backgroundColor: '#FFFFFF',
@@ -306,7 +313,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     padding: 20,
     paddingTop: 40,
-    marginBottom: -200,
+    // marginBottom: -200,
     paddingEnd: 40,
     paddingStart: 40,
     alignItems: 'center',
@@ -378,6 +385,29 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom:14
+  },
+  backIcon: {
+    width: 40,
+    height: 40,
+  },
+  backText: {
+    marginRight: 5,
+    color: '#5F5F5F',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  toggleButtonText: {
+    paddingTop:12,
+    fontSize:16,
+    color: '#F26E22',
+    fontWeight: '600',
   },
 });
 

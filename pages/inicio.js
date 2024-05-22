@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text, Image, ScrollView, SafeAreaVi
 
 export function Inicio({ navigation }) {
     const handleLoginPress = () => {
-        navigation.navigate('Cadastro');
+        navigation.navigate('Login');
     };
 
     const handleBackPress = () => {
