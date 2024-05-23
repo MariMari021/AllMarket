@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   conteudo: {
     backgroundColor: "#fff",
     width: '100%',
-    height: 730,
+    height: 610,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
