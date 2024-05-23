@@ -90,8 +90,9 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
 
             {listasSalvas.length === 0 ? ( // Verifica se não há listas salvas
                 <View style={styles.emptyListContainer}>
-                    <Text style={styles.emptyListText}>Salve as listas</Text>
-                    <Text style={styles.emptyListText}>para aparecer <Text style={styles.yellowText}>aqui!</Text></Text>
+                    <Text style={styles.emptyListText}>Fazendo o login</Text>
+                    <Text style={styles.emptyListText}>as listas ficam salvas</Text>
+                    <Text style={styles.emptyListText}>para sempre!</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Home')}>
                         <Image
                             style={styles.mais}

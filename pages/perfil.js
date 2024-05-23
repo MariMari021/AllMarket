@@ -48,7 +48,7 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
   };
 
   return (
-    <ScrollView>
+    <ScrollView style={{backgroundColor: '#F9F9F9'}}>
       <View style={styles.container}>
         <View style={styles.header2}>
           <View style={styles.headerInicio}>
@@ -118,8 +118,12 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
             </View>
           )}
           <View style={styles.verTutorial}>
-            <TouchableOpacity style={styles.botaoTutorial} onPress={handleLogout}>
-              <Text style={styles.tutorialTexto}>Fazer logout</Text>
+            <TouchableOpacity style={styles.botaoTutorial2} onPress={handleLogout}>
+              <Text style={styles.tutorialTexto}>Mudar conta</Text>
+              <Image source={require('../assets/setaDireita.png')} style={styles.setaVerde} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.botaoTutorial} onPress={() => navigation.navigate('Tutorial')}>
+              <Text style={styles.tutorialTexto}>Tutorial</Text>
               <Image source={require('../assets/setaDireita.png')} style={styles.setaVerde} />
             </TouchableOpacity>
           </View>
@@ -347,6 +351,19 @@ const styles = StyleSheet.create({
     paddingEnd: 38,
     paddingStart: 38,
     backgroundColor: 'white'
+  },
+  botaoTutorial2: {
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.36)',
+    height: 47,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingEnd: 38,
+    paddingStart: 38,
+    backgroundColor: 'white',
+    marginBottom:20
   },
   setaVerde: {
     width: 34,
