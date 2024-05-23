@@ -56,10 +56,10 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
               style={styles.profile}
               source={require('../assets/profile.png')}
             />
-            <TouchableOpacity onPress={handleNavigateToCompras}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
               <Image
                 style={styles.sacola}
-                source={require('../assets/sacola.png')}
+                source={require('../assets/homeIcon.png')}
               />
             </TouchableOpacity>
           </View>
@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
     height: 45
   },
   sacola: {
-    width: 30,
-    height: 30
+    width: 36,
+    height: 36
   },
   header2: {
     backgroundColor: "#fff",

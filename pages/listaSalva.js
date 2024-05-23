@@ -75,10 +75,10 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
                             source={require('../assets/profile.png')}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleNavigateToCompras}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Home')}>
                         <Image
                             style={styles.sacola}
-                            source={require('../assets/sacola.png')}
+                            source={require('../assets/homeIcon.png')}
                         />
                     </TouchableOpacity>
                 </View>
@@ -432,8 +432,8 @@ const styles = StyleSheet.create({
         height: 45
     },
     sacola: {
-        width: 30,
-        height: 30
+        width: 36,
+        height: 36
     },
     bemVindo: {
         paddingTop: 20,

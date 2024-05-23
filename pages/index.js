@@ -412,10 +412,10 @@ export function Home({ route, navigation }) {
                                 source={require('../assets/profile.png')}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleNavigateToCompras}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Main')}>
                             <Image
                                 style={styles.sacola}
-                                source={require('../assets/sacola.png')}
+                                source={require('../assets/homeIcon.png')}
                             />
                         </TouchableOpacity>
                     </View>
@@ -764,6 +764,27 @@ export function Home({ route, navigation }) {
                         </Text>
                     </View>
                 </View>
+
+
+                <View style={styles.centeredViewVantagens}>
+                    <TouchableOpacity style={styles.buttonVantagens} onPress={handleNavigateToCompras}>
+                        <View style={styles.containerVantagens}>
+                            <View style={styles.textContainerVantagens}>
+                                <Text style={styles.titleVantagens}>Vantagens da {'\n'}Compra:</Text>
+                                <Text style={styles.subtitleVantagens}>
+                                    <Text style={styles.clickHereVantagens}>Clique </Text>
+                                    <Text style={styles.highlightVantagens}>aqui </Text>
+                                    e veja {'\n'}as vantagens!
+                                </Text>
+                            </View>
+                            <Image
+                                source={require('../assets/vantagemImg.png')}
+                                style={styles.imageVantagens}
+                            />
+                        </View>
+                    </TouchableOpacity>
+                </View>
+
                 <View style={styles.container}>
                     {limiteUltrapassado && (
                         <Animatable.View
@@ -813,8 +834,8 @@ const styles = StyleSheet.create({
         height: 45
     },
     sacola: {
-        width: 30,
-        height: 30
+        width: 36,
+        height: 36
     },
     bemVindo: {
         paddingTop: 20,
@@ -1382,6 +1403,56 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter',
         color: 'white',
         fontSize: 18
-    }
+    },
+
+    centeredViewVantagens: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonVantagens: {
+        borderRadius: 15,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        backgroundColor: '#fff',
+        padding: 22,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 40
+       
+    },
+    containerVantagens: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    textContainerVantagens: {
+        flexDirection: 'column',
+        marginRight: 10,
+    },
+    titleVantagens: {
+        fontSize: 20.5,
+        fontWeight: 'bold',
+        color: '#5f5f5f',
+    },
+    subtitleVantagens: {
+        fontSize: 17.5,
+        color: '#0B8C38',
+        fontWeight: 'bold',
+        top: 3
+    },
+   
+    highlightVantagens: {
+        color: '#F26E22',
+        fontWeight: 'bold',
+    },
+    imageVantagens: {
+        width: 115, // ajuste de acordo com o tamanho real da imagem
+        height: 115, // ajuste de acordo com o tamanho real da imagem
+    },
 
 });
+
