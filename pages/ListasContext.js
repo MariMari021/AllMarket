@@ -16,6 +16,7 @@ export const ListasProvider = ({ children }) => {
         setListasSalvas(listas);
       }
     };
+
     fetchListas();
   }, [userId]);
 
@@ -40,9 +41,13 @@ export const ListasProvider = ({ children }) => {
 
   const saveListas = async (listas) => {
     try {
-      const jsonValue = JSON.stringify(listas);
-      await AsyncStorage.setItem(`@listasSalvas_${userId}`, jsonValue);
-      setListasSalvas(listas);
+      if (userId) {
+        const jsonValue = JSON.stringify(listas);
+        await AsyncStorage.setItem(`@listasSalvas_${userId}`, jsonValue);
+        setListasSalvas(listas);
+      } else {
+        console.error('Erro ao salvar as listas: userId é nulo');
+      }
     } catch (error) {
       console.error('Erro ao salvar as listas:', error);
     }
@@ -55,6 +60,4 @@ export const ListasProvider = ({ children }) => {
   );
 };
 
-export const useListas = () => {
-  return useContext(ListasContext);
-};
+export const useListas = () => useContext(ListasContext);

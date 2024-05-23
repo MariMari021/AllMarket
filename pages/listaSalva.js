@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Modal, ScrollView, StyleSheet, Image } fr
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useListas } from './ListasContext';
+import { useUser } from './UserContext';
 
 export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
     const navigation = useNavigation();
@@ -10,6 +11,7 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
     const [selectedLista, setSelectedLista] = useState(null);
     const [modalExcluirVisible, setModalExcluirVisible] = useState(false);
     const { listasSalvas, setListasSalvas, saveListas } = useListas();
+    const { userId } = useUser();
 
     useEffect(() => {
         if (route.params?.listasSalvas) {
@@ -25,7 +27,7 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
     const salvarListas = async (listas) => {
         try {
             const jsonValue = JSON.stringify(listas);
-            await AsyncStorage.setItem('@listasSalvas', jsonValue);
+            await AsyncStorage.setItem(`@listasSalvas_${userId}`, jsonValue);
         } catch (error) {
             console.error('Erro ao salvar as listas: ', error);
         }
@@ -33,7 +35,7 @@ export function ListaSalva({ route, valorLimite, categoriasComTotais }) {
 
     const carregarListasSalvas = async () => {
         try {
-            const listasSalvasString = await AsyncStorage.getItem('@listasSalvas');
+            const listasSalvasString = await AsyncStorage.getItem(`@listasSalvas_${userId}`);
             if (listasSalvasString !== null) {
                 setListasSalvas(JSON.parse(listasSalvasString));
             }

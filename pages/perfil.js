@@ -7,9 +7,8 @@ import { useUser } from './UserContext'; // Importe o contexto de usuário
 
 export function Perfil({ valorLimite, categoriasComTotais }) {
   const navigation = useNavigation();
-  const { listasSalvas, totalProdutos } = useListas(); // Use o contexto das listas
-  const { setUserId, setIsAnonymous } = useUser(); // Use o contexto de usuário
-
+  const { listasSalvas, totalProdutos } = useListas();
+  const { userId, isAnonymous, logout } = useUser();
   const [userData, setUserData] = useState({ username: '', email: '', password: '' });
 
   useEffect(() => {
@@ -27,15 +26,13 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
       }
     };
 
-    getUserData();
-  }, []);
+    if (!isAnonymous) {
+      getUserData();
+    }
+  }, [isAnonymous]);
 
   const numListasSalvas = listasSalvas.length;
-  const [produtosAdicionados, setProdutosAdicionados] = useState([]); // Estado para armazenar os produtos adicionados
-
-  const numProdutosAdicionados = produtosAdicionados.length; // Calcula o número de produtos adicionados
-
-  const firstName = userData.username.split(' ')[0];
+  const firstName = !isAnonymous && userData.username ? userData.username.split(' ')[0] : 'Anônimo';
 
   const handleNavigateToCompras = () => {
     navigation.navigate('Compras', { ultimoValorLimite: valorLimite, categoriasComTotais });
@@ -43,9 +40,7 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('user_email');
-      setUserId(null);
-      setIsAnonymous(true);
+      await logout();
       navigation.navigate('Login');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
@@ -75,7 +70,6 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
           </View>
         </View>
         <View style={styles.tudo}>
-
           <View style={styles.cardContainer}>
             <View style={styles.card}>
               <Text style={styles.cardTitle}><Text style={styles.yellowText}>Produtos</Text>{'\n'}na lista</Text>
@@ -100,27 +94,29 @@ export function Perfil({ valorLimite, categoriasComTotais }) {
               </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.sectionTitleContainer}>
-            <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Nome" value={userData.username} />
-          </View>
-          <View style={styles.inputContainer}>
-            <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Email" value={userData.email} />
-          </View>
-          <View style={styles.inputContainerCadastro}>
-            <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
-            <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} />
-          </View>
-          <View style={styles.verCadastro}>
-            <TouchableOpacity style={styles.botaoTutorial} onPress={() => navigation.navigate('Tutorial')}>
-              <Text style={styles.tutorialTexto}>Ver Tutorial</Text>
-              <Image source={require('../assets/setaDireita.png')} style={styles.setaVerde} />
-            </TouchableOpacity>
-          </View>
+          {!isAnonymous ? (
+            <>
+              <View style={styles.sectionTitleContainer}>
+                <Text style={styles.sectionTitle}>Dados {'\n'}Cadastrados</Text>
+              </View>
+              <View style={styles.inputContainer}>
+                <Image source={require('../assets/profile.png')} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Nome" value={userData.username} editable={false} />
+              </View>
+              <View style={styles.inputContainer}>
+                <Image source={require('../assets/emailIcon.png')} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Email" value={userData.email} editable={false} />
+              </View>
+              <View style={styles.inputContainerCadastro}>
+                <Image source={require('../assets/senhaIcon.png')} style={styles.inputIcon} />
+                <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} value={userData.password} editable={false} />
+              </View>
+            </>
+          ) : (
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Você está logado como anônimo.</Text>
+            </View>
+          )}
           <View style={styles.verTutorial}>
             <TouchableOpacity style={styles.botaoTutorial} onPress={handleLogout}>
               <Text style={styles.tutorialTexto}>Fazer logout</Text>

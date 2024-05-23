@@ -6,59 +6,47 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [isAnonymous, setIsAnonymous] = useState(true);
-  const [produtosAdicionados, setProdutosAdicionados] = useState([]);
+
+  const initializeAnonymousUser = async () => {
+    let anonymousId = await AsyncStorage.getItem('anonymousId');
+    if (!anonymousId) {
+      anonymousId = `anonymous-${Date.now()}`;
+      await AsyncStorage.setItem('anonymousId', anonymousId);
+    }
+    setUserId(anonymousId);
+    setIsAnonymous(true);
+  };
+
+  const initializeUser = async () => {
+    const savedEmail = await AsyncStorage.getItem('user_email');
+    if (savedEmail) {
+      setUserId(savedEmail);
+      setIsAnonymous(false);
+    } else {
+      await initializeAnonymousUser();
+    }
+  };
 
   useEffect(() => {
-    const initializeAnonymousUser = async () => {
-      let anonymousId = await AsyncStorage.getItem('anonymousId');
-      if (!anonymousId) {
-        anonymousId = `anonymous-${Date.now()}`;
-        await AsyncStorage.setItem('anonymousId', anonymousId);
-      }
-      setUserId(anonymousId);
-    };
-
-    const initializeUser = async () => {
-      const savedEmail = await AsyncStorage.getItem('user_email');
-      if (savedEmail) {
-        setUserId(savedEmail);
-        setIsAnonymous(false);
-      } else {
-        initializeAnonymousUser();
-      }
-    };
-
     if (!userId) {
       initializeUser();
     }
   }, [userId]);
 
-  const saveProdutos = async (produtos) => {
-    try {
-      await AsyncStorage.setItem(`produtos_${userId}`, JSON.stringify(produtos));
-      setProdutosAdicionados(produtos);
-    } catch (error) {
-      console.error('Erro ao salvar produtos:', error);
-    }
-  };
-
   const logout = async () => {
     try {
-      console.log('Logging out from UserContext...');
-      await saveProdutos([]); // Save empty products list
+      await AsyncStorage.removeItem('user_email');
+      await AsyncStorage.removeItem('anonymousId');
       setUserId(null);
       setIsAnonymous(true);
-      setProdutosAdicionados([]); // Clear the products
-      await AsyncStorage.removeItem('anonymousId');
-      await AsyncStorage.removeItem('user_email');
-      console.log('Logged out from UserContext successfully');
+      await initializeAnonymousUser();
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
   };
 
   return (
-    <UserContext.Provider value={{ userId, setUserId, isAnonymous, setIsAnonymous, logout, produtosAdicionados, setProdutosAdicionados }}>
+    <UserContext.Provider value={{ userId, setUserId, isAnonymous, setIsAnonymous, logout }}>
       {children}
     </UserContext.Provider>
   );

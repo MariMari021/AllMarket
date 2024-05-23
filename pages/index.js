@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, ScrollView, View, Text, Image, TouchableOpacity, TextInput, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CardAdicionado } from './cardAdicionado'; // Importe o componente CardAdicionado, se necessário
@@ -6,23 +6,26 @@ import { useFonts } from 'expo-font';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
 import * as SplashScreen from 'expo-splash-screen';
+import { useUser } from './UserContext';
+import { useListas } from './ListasContext';
 
 
 export function Home({ route, navigation }) {
-    const [nextId, setNextId] = useState(0); // Inicialize nextId com 0
+    const { listasSalvas, setListasSalvas, saveListas } = useListas();
+    const { userId } = useUser();
+    const [nextId, setNextId] = useState(0);
     const [modalNenhumProdutoVisible, setModalNenhumProdutoVisible] = useState(false);
     const [produtosAdicionados, setProdutosAdicionados] = useState([]);
     const [temCardAdicionado, setTemCardAdicionado] = useState(false);
     const [categoriasSelecionadas, setCategoriasSelecionadas] = useState([]);
-    const [totalPreco, setTotalPreco] = useState(0); // Estado para armazenar o total do preço dos produtos
+    const [totalPreco, setTotalPreco] = useState(0);
     const [preco, setPreco] = useState('');
     const [valorLimite, setValorLimite] = useState('');
     const [categoriasComTotais, setCategoriasComTotais] = useState([]);
     const [categoriasComProdutos, setCategoriaComProdutos] = useState([]);
-    const [limiteUltrapassado, setLimiteUltrapassado] = useState(false); // Estado para controlar se o limite foi ultrapassado
-    // Defina um estado para a quantidade do produto
+    const [limiteUltrapassado, setLimiteUltrapassado] = useState(false);
     const [quantidade, setQuantidade] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('Variados'); // Define "Categoria1" como categoria inicial selecionada
+    const [selectedCategory, setSelectedCategory] = useState('Variados');
     const [scrollStates, setScrollStates] = useState({});
     const [nomeProduto, setNomeProduto] = useState('');
     const [modalAdicionarCardVisible, setModalAdicionarCardVisible] = useState(false);
@@ -32,18 +35,23 @@ export function Home({ route, navigation }) {
     const [modalSalvarVisible, setModalSalvarVisible] = useState(false);
     const [categoriaParaSalvar, setCategoriaParaSalvar] = useState('');
     const [nomeDaLista, setNomeDaLista] = useState('');
-    const [listasSalvas, setListasSalvas] = useState([]);
     const [modalListaExistenteVisible, setModalListaExistenteVisible] = useState(false);
     const [modalListaSalvaSucessoVisible, setModalListaSalvaSucessoVisible] = useState(false);
 
-
-
     useFocusEffect(
-        React.useCallback(() => {
-            if (route.params?.listasSalvas) {
-                setListasSalvas(route.params.listasSalvas);
-            }
-        }, [route.params?.listasSalvas])
+        useCallback(() => {
+            const carregarListasSalvas = async () => {
+                try {
+                    const listasSalvasString = await AsyncStorage.getItem(`@listasSalvas_${userId}`);
+                    if (listasSalvasString !== null) {
+                        setListasSalvas(JSON.parse(listasSalvasString));
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar as listas salvas: ', error);
+                }
+            };
+            carregarListasSalvas();
+        }, [userId])
     );
 
     useEffect(() => {
@@ -97,65 +105,12 @@ export function Home({ route, navigation }) {
 
 
 
-
-    useFocusEffect(
-        React.useCallback(() => {
-            const carregarListasSalvas = async () => {
-                try {
-                    const listasSalvasString = await AsyncStorage.getItem('@listasSalvas');
-                    if (listasSalvasString !== null) {
-                        setListasSalvas(JSON.parse(listasSalvasString));
-                    }
-                } catch (error) {
-                    console.error('Erro ao carregar as listas salvas: ', error);
-                }
-            };
-            carregarListasSalvas();
-        }, [])
-    );
-
-    const saveListas = async (listas) => {
-        try {
-            const jsonValue = JSON.stringify(listas);
-            await AsyncStorage.setItem('@listasSalvas', jsonValue);
-        } catch (e) {
-            console.error('Failed to save the lists to storage', e);
-        }
-    };
-
-    const loadListas = async () => {
-        try {
-            const jsonValue = await AsyncStorage.getItem('@listasSalvas');
-            return jsonValue != null ? JSON.parse(jsonValue) : [];
-        } catch (e) {
-            console.error('Failed to load the lists from storage', e);
-        }
-    };
-
-
-    useEffect(() => {
-        const fetchListas = async () => {
-            const listas = await loadListas();
-            setListasSalvas(listas);
-        };
-        fetchListas();
-    }, []);
-
-    useEffect(() => {
-        saveListas(listasSalvas);
-    }, [listasSalvas]);
-
-
-
-
-
     // UseEffect para atualizar as categorias com produtos sempre que houver uma mudança em produtosAdicionados
     useEffect(() => {
         const categoriasComProdutos = getCategoriasComProdutos();
         setCategoriaComProdutos(categoriasComProdutos);
     }, [produtosAdicionados]);
 
-    // Função para determinar quais categorias têm produtos adicionados
     const getCategoriasComProdutos = () => {
         const categoriasComProdutos = [];
         categoriasSelecionadas.forEach(categoria => {
@@ -166,28 +121,17 @@ export function Home({ route, navigation }) {
         return categoriasComProdutos;
     };
 
-    // Função para lidar com a seleção de uma categoria
     const handleCategoryPress = (categoria) => {
         setSelectedCategory(categoria);
     };
-
-
 
     const handleValorLimiteChange = (value) => {
         setValorLimite(value);
     };
 
-
-
     useEffect(() => {
-        if (produtosAdicionados.length > 0) {
-            setTemCardAdicionado(true);
-        } else {
-            setTemCardAdicionado(false);
-        }
+        setTemCardAdicionado(produtosAdicionados.length > 0);
     }, [produtosAdicionados]);
-
-
 
     const handleScroll = (event, category) => {
         const { contentOffset } = event.nativeEvent;
@@ -198,57 +142,52 @@ export function Home({ route, navigation }) {
     };
 
     const onPressAdicionar = (id, novaQuantidade) => {
-        // Atualize o estado de quantidade do produto com o novo valor
         setProdutosAdicionados(produtosAdicionados.map(produto => produto.id === id ? { ...produto, quantidade: novaQuantidade } : produto));
     };
 
-    const renderCategoryScrollView = (category, imgSource) => {
-        return (
-            <ScrollView
-                key={category}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                onScroll={(event) => handleScroll(event, category)}
-                scrollEventThrottle={16}
-            >
-                <View style={styles.cardContainer}>
-                    <View style={styles.card}>
+    const renderCategoryScrollView = (category, imgSource) => (
+        <ScrollView
+            key={category}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            onScroll={(event) => handleScroll(event, category)}
+            scrollEventThrottle={16}
+        >
+            <View style={styles.cardContainer}>
+                <View style={styles.card}>
+                    <Image
+                        style={styles.imgCardAdicionar}
+                        source={imgSource}
+                    />
+                    <Text style={styles.tituloAdicionar}>
+                        Adicionar
+                    </Text>
+                    <Text style={styles.tituloAdicionarSpan}> o produto!</Text>
+                    <TouchableOpacity style={styles.botaoMais} onPress={() => navigation.navigate('Produtos')}>
                         <Image
-                            style={styles.imgCardAdicionar}
-                            source={imgSource}
+                            style={styles.maisProduto}
+                            source={require('../assets/imgMaisProduto.png')}
                         />
-                        <Text style={styles.tituloAdicionar}>
-                            Adicionar
-                        </Text>
-                        <Text style={styles.tituloAdicionarSpan}> o produto!</Text>
-                        <TouchableOpacity style={styles.botaoMais} onPress={() => navigation.navigate('Produtos')}>
-                            <Image
-                                style={styles.maisProduto}
-                                source={require('../assets/imgMaisProduto.png')}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    {produtosAdicionados
-                        .filter(produto => produto.categoria === selectedCategory)
-                        .map((produto) => (
-                            <CardAdicionado
-                                key={produto.id}
-                                id={produto.id}
-                                nome={produto.nome}
-                                quantidade={produto.quantidade}
-                                preco={produto.preco}
-                                onPressRemover={removerProduto}
-                                onPressEditar={editarProduto}
-                                onPressAdicionar={onPressAdicionar}
-                                navigation={navigation}
-                            />
-                        ))}
+                    </TouchableOpacity>
                 </View>
-            </ScrollView>
-        );
-    };
-
-
+                {produtosAdicionados
+                    .filter(produto => produto.categoria === selectedCategory)
+                    .map((produto) => (
+                        <CardAdicionado
+                            key={produto.id}
+                            id={produto.id}
+                            nome={produto.nome}
+                            quantidade={produto.quantidade}
+                            preco={produto.preco}
+                            onPressRemover={removerProduto}
+                            onPressEditar={editarProduto}
+                            onPressAdicionar={onPressAdicionar}
+                            navigation={navigation}
+                        />
+                    ))}
+            </View>
+        </ScrollView>
+    );
 
     const getCategoryScrollView = (category) => {
         switch (category) {
@@ -268,12 +207,10 @@ export function Home({ route, navigation }) {
                 return renderCategoryScrollView(category, require('../assets/frios.png'));
             case 'Outros':
                 return renderCategoryScrollView(category, require('../assets/outros.png'));
-            // Adicione mais casos conforme necessário para outras categorias
             default:
                 return null;
         }
     };
-
 
     const toggleCategoriaSelecionada = (categoria) => {
         setCategoriasSelecionadas(prevState =>
@@ -307,12 +244,9 @@ export function Home({ route, navigation }) {
         }
     };
 
-
     useEffect(() => {
         console.log("Modal visibility changed:", modalVisible);
     }, [modalVisible]);
-
-
 
     const generateUniqueId = () => {
         const id = `id_${nextId}`;
@@ -320,8 +254,6 @@ export function Home({ route, navigation }) {
         return id;
     };
 
-
-    // Adicionar produto
     const adicionarProduto = async (produto) => {
         const produtoComCategoria = { ...produto, categoria: selectedCategory };
         if (!produtoComCategoria.id) {
@@ -332,9 +264,6 @@ export function Home({ route, navigation }) {
         setProdutosAdicionados(novosProdutosAdicionados);
         await saveProdutos(novosProdutosAdicionados);
     };
-
-
-
 
     useEffect(() => {
         const categorias = produtosAdicionados.reduce((acc, produto) => {
@@ -348,12 +277,9 @@ export function Home({ route, navigation }) {
 
         setCategoriasComTotais(Object.entries(categorias).map(([categoria, total]) => ({
             categoria,
-            total: total.toFixed(2) // Formata o total para duas casas decimais
+            total: total.toFixed(2)
         })));
     }, [produtosAdicionados]);
-
-
-
 
     const removerProduto = async (idParaRemover) => {
         const indexToRemove = produtosAdicionados.findIndex(produto => produto.id === idParaRemover);
@@ -365,7 +291,6 @@ export function Home({ route, navigation }) {
             await saveProdutos(newProdutosAdicionados);
         }
     };
-
 
     const saveProdutos = async (produtos) => {
         try {
@@ -385,23 +310,19 @@ export function Home({ route, navigation }) {
         }
     };
 
-
     useEffect(() => {
         const fetchData = async () => {
             const produtos = await loadProdutos();
             setProdutosAdicionados(produtos);
-    
-            // Inicializando nextId com o maior ID atual + 1
+
             const maxId = produtos.reduce((max, produto) => {
-                const idNum = parseInt(produto.id.split('_')[1], 10); // Parsing to integer
+                const idNum = parseInt(produto.id.split('_')[1], 10);
                 return !isNaN(idNum) ? Math.max(max, idNum) : max;
             }, 0);
             setNextId(maxId + 1);
         };
         fetchData();
     }, []);
-    
-
 
     useEffect(() => {
         console.log("Produtos carregados:", produtosAdicionados);
@@ -410,10 +331,6 @@ export function Home({ route, navigation }) {
             console.error("Produtos com IDs duplicados detectados!");
         }
     }, [produtosAdicionados]);
-
-
-
-
 
     const editarProduto = async (produtoEditado) => {
         const index = produtosAdicionados.findIndex(p => p.id === produtoEditado.id);
@@ -426,20 +343,14 @@ export function Home({ route, navigation }) {
             console.error("Produto não encontrado para edição!");
         }
     };
-    
-
-
-
 
     useEffect(() => {
         saveProdutos(produtosAdicionados);
     }, [produtosAdicionados]);
 
-
     useEffect(() => {
         if (route.params && route.params.novoProduto) {
-            const novoProduto = route.params.novoProduto;
-            adicionarProduto(novoProduto);
+            adicionarProduto(route.params.novoProduto);
         }
     }, [route.params]);
 
@@ -456,7 +367,6 @@ export function Home({ route, navigation }) {
         const limite = parseFloat(valorLimite);
         setLimiteUltrapassado(totalPreco > limite);
     }, [totalPreco, valorLimite]);
-
 
     const [fontsLoaded, fontError] = useFonts({ 'Inter': require('../assets/fonts/Inter-VariableFont_slnt,wght.ttf') });
 

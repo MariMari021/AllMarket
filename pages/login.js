@@ -19,14 +19,6 @@ export function Login() {
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {
-        const keys = await AsyncStorage.getAllKeys();
-        const users = await AsyncStorage.multiGet(keys);
-
-        console.log('Usuários cadastrados:');
-        users.forEach(([key, value]) => {
-          console.log(key + ': ' + value);
-        });
-
         const savedEmail = await AsyncStorage.getItem('user_email');
         if (savedEmail) {
           setIsAnonymous(false);
@@ -37,8 +29,7 @@ export function Login() {
       }
     };
     checkUserLoggedIn();
-  }, []);
-
+  }, [setIsAnonymous, navigation]);
 
   const handleEmailChange = (text) => {
     setEmail(text);
@@ -94,7 +85,6 @@ export function Login() {
           setErrorMessage('Usuário já cadastrado com esse email.');
         } else {
           const newUser = { email, password, username, birthday, phone };
-          // Adicionando log dos dados do novo usuário
           console.log('Usuário cadastrado:', JSON.stringify(newUser));
           await AsyncStorage.setItem(email, JSON.stringify(newUser));
           await AsyncStorage.setItem('user_email', email);
@@ -109,15 +99,15 @@ export function Login() {
     }
   };
 
-
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
     setErrorMessage('');
   };
 
   const handleBackPress = () => {
-    navigation.navigate('Tutorial'); // Navega de volta para a página Index
+    navigation.navigate('Tutorial');
   };
+
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -410,5 +400,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
 
